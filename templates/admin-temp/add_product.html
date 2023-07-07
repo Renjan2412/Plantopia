@@ -1,0 +1,148 @@
+{% extends 'admin-temp/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-md-12 mt-4 d-flex justify-content-center" style="background-color: #f2f2f2; padding: 20px;">
+    <div class="row">
+        <div class="col-6">
+            <div class="content-header">
+                
+                <form enctype="multipart/form-data" method="POST" action="{% url 'add_product' %}">
+                    {% csrf_token %}
+                    <h6 class="content-title" style="text-align: center;">Product Add</h6>
+                    <div class="mb-4">
+                        <label class="form-label">Category</label>
+                        {{ form.catagory }}
+                       {% if form.errors.catagory %}
+                            <label class="text-danger">{{ form.errors.catagory }}</label>
+                        {% endif %} 
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        
+                        {{form.product_name}}
+                        {% if form.errors.product_name%}
+                        <label  class="text-danger">{{form.errors.product_name}}</label>
+                        {% endif %}
+                        
+                    </div>
+                    <div class="mb-3">
+                         <label for="slug" class="form-label">Slug</label> 
+                        {{form.slug}}
+                        {% if form.errors.slug %}
+                        <label  class="text-danger">{{form.errors.slug}}</label>
+                        {% endif %}
+                        
+                    </div> 
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Images</label>
+                        {{form.images}}
+                        {% if form.errors.images%}
+                        <label  class="text-danger">{{form.errors.images}}</label>
+                        {% endif %}
+                    </div>
+                    {% comment %} <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        {{form.quantity}}
+                        {% if form.errors.quantity%}
+                        <label  class="text-danger">{{form.errors.quantity}}</label>
+                        {% endif %}
+                    </div> {% endcomment %}
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        {{form.price}}
+                        {% if form.errors.price %}
+                        <label  class="text-danger">{{ form.errors.price }}</label>
+                        {% endif %}
+                    </div>
+                     <div class="mb-3">
+                        <label for="stock" class="form-label">Stock</label>
+                        {{form.stock}}
+                        {% if form.errors.stock %}
+                        <label  class="text-danger">{{ form.errors.stock }}</label>
+                        {% endif %}
+                    </div> 
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <div class="form-floating">
+                        
+                        {{form.description}}
+                        {% if form.errors.description%}
+                        <label  class="text-danger">{{form.errors.description}}</label>
+                        {% endif %}
+                        </div>   
+                    </div>
+                    {% comment %} <div class="mb-3">
+                        {{form.trending}}
+                        {% if form.errors.trending%}
+                        <label  class="text-danger">{{form.errors.trending}}</label>
+                        {% endif %}
+                        <label class="form-check-label" for="trending">
+                            Trending
+                        </label>
+                    </div> {% endcomment %}
+                    <div class="mb-3">
+                        {{form.is_available}}
+                        {% if form.errors.is_available%}
+                        <label  class="text-danger">{{form.errors.is_available}}</label>
+                        {% endif %}
+                        <label class="form-check-label" for="">
+                            Is available
+                        </label>
+                    </div>
+                    {% comment %} <div class="mb-3">
+                        {{ form.status }}
+                        <label class="form-check-label" for="status">
+                            Status
+                        </label>
+                        {% if form.errors.status %}
+                            <label class="text-danger">{{ form.errors.status }}</label>
+                        {% endif %}
+                    </div> {% endcomment %}
+
+                    {% comment %} {{ image_form.management_form }} {% endcomment %}
+                    {% comment %} {% for form in image_form %}
+                        {{ form.as_p }}
+                    {% endfor %} {% endcomment %}
+                    {% comment %} {{image_form.as_p}} {% endcomment %}
+                    {% comment %} <div class="mb-3">
+                        <input type="file" name="images" multiple>
+                    </div> {% endcomment %}
+                    
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    /* Add white background to form fields */
+    .content-main input,
+    .content-main select,
+    .content-main textarea {
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        padding: 5px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    /* Style the form labels */
+    .content-main label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    /* Style the form submit button */
+    .content-main button[type="submit"] {
+        background-color: #007bff;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+</style>
+
+{% endblock %}

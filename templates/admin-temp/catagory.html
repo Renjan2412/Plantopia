@@ -86,7 +86,7 @@
                                             </a>
                                             <div class="dropdown-menu">
                                                 <a class="dropdown-item" href="#">View detail</a>
-                                                <a class="dropdown-item" href="{% url 'update_catagory' %}">Update</a>
+                                                <a class="dropdown-item" href="{% url 'update_catagory' ca.id %}">Update</a>
                                                 <a class="dropdown-item text-danger" href="{% url 'delete_category' ca.id %}">Delete</a>
                                             </div>
                                         </div> <!-- dropdown //end -->

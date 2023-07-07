@@ -448,7 +448,66 @@
                             <button class="nav-link" id="nav-tab-three" data-bs-toggle="tab" data-bs-target="#tab-three" type="button" role="tab" aria-controls="tab-three" aria-selected="false">New added</button>
                         </li>
                     </ul>
-                    <a href="#" class="view-more d-none d-md-flex">View More<i class="fi-rs-angle-double-small-right"></i></a>
+                    {% comment %} <a href="#" class="view-more d-none d-md-flex">View More<i class="fi-rs-angle-double-small-right"></i></a> {% endcomment %}
+                    
+                    <!-- <div class="header-bottom-set dropdown">
+                        <button class="dropdown-toggle header-action-btn" data-bs-toggle="dropdown">Defualt<i class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a class="dropdown-item" href="#">Name, A to Z</a></li>
+                            <li><a class="dropdown-item" href="#">Name, Z to A</a></li>
+                            <li><a class="dropdown-item" href="#">Price, Low to High</a></li>
+                            <li><a class="dropdown-item" href="#">Price, High to Low</a></li>                       
+                        </ul>
+                    </div> -->
+                    <!-- <div class="col-md-2 col-6">
+                        <div class="custom_select">
+                            <select class="form-select select-nice">
+                                <option selected>Defualt</option>
+                                <option>Name, A to Z</option>
+                                <option>Name, Z to A</option>
+                                <option>Price, Low to High</option>
+                                <option>Price, High to Low</option>
+                            </select>
+                        </div>
+                    </div> -->
+                      {% comment %} <div class="col-md-2 col-6">
+                        <div class="dropdown">
+                          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            Default
+                          </button>
+                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><button class="dropdown-item" type="button" onclick="updateSelection('Name, A to Z')">Name : A to Z</button></li>
+                            <li><button class="dropdown-item" type="button" onclick="updateSelection('Name, Z to A')">Name : Z to A</button></li>
+                            <li><button class="dropdown-item" type="button" onclick="updateSelection('Price, Low to High')">Price : Low to High</button></li>
+                            <li><button class="dropdown-item" type="button" onclick="updateSelection('Price, High to Low')">Price : High to Low</button></li>
+                          </ul>
+                        </div>
+                     </div> {% endcomment %}
+
+                     <div class="col-md-2 col-6">
+                        <div class="dropdown">
+                          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ sort_option }}
+                          </button>
+                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="?sort_option=Name, A to Z">Name : A to Z</a></li>
+                            <li><a class="dropdown-item" href="?sort_option=Name, Z to A">Name : Z to A</a></li>
+                            <li><a class="dropdown-item" href="?sort_option=Price, Low to High">Price : Low to High</a></li>
+                            <li><a class="dropdown-item" href="?sort_option=Price, High to Low">Price : High to Low</a></li>
+                          </ul>
+                        </div>
+                      </div>
+                      
+                     <script>
+                        function updateSelection(option) {
+                          const dropdownButton = document.getElementById("dropdownMenuButton");
+                          dropdownButton.innerHTML = option;
+                        }
+                      </script>
+                      
+                      
+                      
+                    
                 </div>
                 <!--End nav-tabs-->
                 
@@ -544,7 +603,7 @@
                                             {% comment %} <span class="old-price">$245.8</span> {% endcomment %}
                                         </div>
                                         <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="{{ Product.get_url }}"><i class="fi-rs-shopping-bag-add"></i></a>
+                                            <a aria-label="View Details" class="action-btn hover-up" href="{{ Product.get_url }}"><i class="fi-rs-shopping-bag-add"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -590,7 +649,7 @@
                                             {% comment %} <span class="old-price">$245.8</span> {% endcomment %}
                                         </div>
                                         <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="{{ Product.get_url }}"><i class="fi-rs-shopping-bag-add"></i></a>
+                                            <a aria-label="View Details" class="action-btn hover-up" href="{{ Product.get_url }}"><i class="fi-rs-shopping-bag-add"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -1902,7 +1961,7 @@
         </div>
     </div> -->
     <!-- Vendor JS-->
-     <script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+     {% comment %} <script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
     <script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
     <script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
     <script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
@@ -1926,11 +1985,15 @@
     <script src="{% static 'assets/js/main.js' %}"></script>
     <script src="{% static 'assets/js/shop.js' %}"></script> 
 
+    
+    
+    
+
    
-</body>
+</body> {% endcomment %}
 
 
 <!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:25:49 GMT -->
-</html>
+{% comment %} </html> {% endcomment %}
 
  {% endblock %} 

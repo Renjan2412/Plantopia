@@ -47,18 +47,17 @@ def catagory_add(request) :
     
 @never_cache
 @login_required(login_url='user_login')
-def update_catagory(request):
+def update_catagory(request , id):
     if request.user.is_superadmin:
-        if request.method == 'POST':
-            form = CatagoryForm(request.POST, request.FILES)
+        catagory = get_object_or_404(Catagory, id=id)
+        if request.method == "POST":
+            form = CatagoryForm(request.POST, request.FILES, instance=catagory)
             if form.is_valid():
-                form.save()
-                return redirect('catagory-list')
+                catagory = form.save()
+                return redirect('my_admin_category')
         else:
-            form = CatagoryForm()
-    
-        return render(request, 'admin-temp/update_catagory.html', {'form': form})
-
+            form = CatagoryForm(instance = catagory)
+        return render(request, "admin-temp/update_catagory.html",{'form':form})
 @never_cache
 @login_required(login_url='user_login')
 def delete_category(request, id):

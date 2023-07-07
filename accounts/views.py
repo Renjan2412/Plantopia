@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
-from .forms import RegistrationForm,UserForm,userProfileForm
+from .forms import RegistrationForm,UserForm,UserProfileForm
 from .models import Account , UserProfile
 from django.contrib import messages,auth
 from django.contrib.auth import login,logout,authenticate
@@ -14,15 +14,38 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from carts.views import _cart_id
 from carts.models import Cart,CartItem
+import requests,logging
+from urllib.parse import urlparse, parse_qs
 
 # Create your views here.
 
-def home(request) :
-    products = Product.objects.all().filter(is_available=True)
+# def home(request) :
+    
+#     products = Product.objects.all().filter(is_available=True)
+
+#     context = {
+#         'products' : products,
+#     }
+#     return render(request,'home.html',context)
+def home(request):
+    sort_option = request.GET.get('sort_option', 'default')
+
+    if sort_option == 'Name, A to Z':
+        products = Product.objects.filter(is_available=True).order_by('product_name')
+    elif sort_option == 'Name, Z to A':
+        products = Product.objects.filter(is_available=True).order_by('-product_name')
+    elif sort_option == 'Price, Low to High':
+        products = Product.objects.filter(is_available=True).order_by('price')
+    elif sort_option == 'Price, High to Low':
+        products = Product.objects.filter(is_available=True).order_by('-price')
+    else:
+        products = Product.objects.filter(is_available=True)
+
     context = {
-        'products' : products
+        'products': products,
+        'sort_option': sort_option,
     }
-    return render(request,'home.html',context)
+    return render(request, 'home.html', context)
 
 def register(request) :
     if request.method == 'POST' :
@@ -72,7 +95,20 @@ def user_login(request) :
                 pass    
             auth.login(request , user)
             messages.success(request, 'You Are Now Logged IN')
-            return redirect('dashboard')
+            url = request.META.get('HTTP_REFERER')
+            if url is None:
+                return redirect('dashboard')
+
+            try:
+                parsed_url = urlparse(url)
+                query = parsed_url.query  
+                params = parse_qs(query)
+                if 'next' in params:
+                    nextPage = params['next'][0]
+                    return redirect(nextPage)
+            except Exception as e:
+                logging.error(f'Error occurred: {e}')
+                return redirect('dashboard')
         
         else :
             messages.error(request , 'Invalid Login Credential')
@@ -157,11 +193,16 @@ def forgotPassword(request) :
 def resetPassword_validate(request) :
     return HttpResponse("ok")
 
+@login_required
 def edit_profile(request) :
-    userprofile = None
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        user_profile = None
     if request.method == "POST" :
         user_form = UserForm(request.POST,instance=request.user)
-        profile_form = userProfileForm(request.POST,request.FILES,instance=userprofile)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+
         if user_form.is_valid() and profile_form.is_valid() :
             user_form.save()
             profile_form.save()
@@ -171,7 +212,7 @@ def edit_profile(request) :
         user = request.user
         userprofile = get_object_or_404(UserProfile, user=user)
         user_form = UserForm(instance=request.user)
-        profile_form = userProfileForm(instance=userprofile)
+        profile_form = UserProfileForm(instance=userprofile)
     context = {
         'userprofile' : userprofile,
         'user_form' : user_form,

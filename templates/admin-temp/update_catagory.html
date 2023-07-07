@@ -3,46 +3,50 @@
 
 {% block content %}
 
-<div class="col-md-12 mt-4 d-flex justify-content-center" style="padding-bottom: 70px;">
-    <div class="col-md-6 mt-3">
-        <form method='post' enctype="multipart/form-data">
-            {% csrf_token %}
-            {% comment %} {{ form.as_p }} {% endcomment %}
-            <div class="mb-4">
-                <h3 style="text-align: center;">Catagory Update</h3>
-            </div> 
-            <div class="mb-4">
-                <label for="catagory_name" class="form-label">Name</label>
-                 <input type="text" placeholder="Type here" class="form-control"
-                 id="catagory_name" name="catagory_name"   /> 
-                    {% comment %} {{ form.catagory_name }} {% endcomment %}
+<div class="col-md-12 mt-4 d-flex justify-content-center" style=" background-color: white; padding: 20px;">
+    <div class="row">
+        <div class="col-6">
+            <div class="content-header">
+                <form enctype="multipart/form-data" method="POST" >
+                    {% csrf_token %}
+                    <h6 class="content-title" style="text-align: center;">Update Category</h6>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        {{ form.catagory_name }}
+                        {% if form.errors.catagory_name %}
+                        <label  class="text-danger">{{ form.errors.catagory_name }}</label>
+                        {% endif %}
+                        
+                    </div>
+                    <div class="mb-3">
+                         <label for="slug" class="form-label">Slug</label> 
+                        {{form.slug}}
+                        {% if form.errors.slug %}
+                        <label  class="text-danger">{{form.errors.slug}}</label>
+                        {% endif %}
+                        
+                    </div> 
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Images</label>
+                        {{form.cat_image}}
+                        {% if form.errors.cat_image%}
+                        <label  class="text-danger">{{form.errors.cat_image}}</label>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <div class="form-floating">
+                        
+                        {{form.description}}
+                        {% if form.errors.description%}
+                        <label  class="text-danger">{{form.errors.description}}</label>
+                        {% endif %}
+                        </div>   
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Category</button>
+                </form>
             </div>
-            <div class="mb-4">
-                <label for="catagory_slug" class="form-label">Slug</label>
-                 <input type="text" placeholder="Type here" class="form-control"
-                    name="catagory_slug" /> 
-                    {% comment %} {{ form.slug }} {% endcomment %}
-            </div>
-            {% comment %} <div class="mb-4">
-                <label class="form-label">Category</label>
-                <input type="text" placeholder="Type here" class="form-control"
-                    id="product_category" />
-            </div>  {% endcomment %}
-            <div class="mb-4">
-                <label class="form-label">Description</label>
-               <textarea placeholder="Type here" class="form-control" name='catagory_description'></textarea> 
-                {% comment %} {{ form.description }} {% endcomment %}
-            </div>
-            <div class="mb-4">
-                <label for="catagory_image" class="form-label">Image</label>
-                 <input type="file" id="catagory_image" name="catagory_image" accept="image/*" class="form-control" /> 
-                {% comment %} {{ form.cat_image }} {% endcomment %}
-            </div> 
-            <div class="d-grid">
-                <button type='submit' class="btn btn-primary">Update category</button>
-            </div>
-            
-        </form>
+        </div>
     </div>
 </div>
 

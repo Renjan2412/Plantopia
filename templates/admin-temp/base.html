@@ -20,6 +20,8 @@
         <!-- Template CSS -->
         <link href="{% static 'assets-1/css/main.css' %}" rel="stylesheet"
             type="text/css" />
+        {% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.5.0/css/bootstrap.min.css"> {% endcomment %}
+        <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.min.css'></link>  
     </head>
 
     <body>
@@ -53,6 +55,11 @@
         <!-- Main Script -->
         <script src="{% static 'assets-1/js/main.js' %}" type="text/javascript"></script>
         <script src="{% static 'assets-1/js/custom-chart.js' %}" type="text/javascript"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        {% block script %}
+        
+        
+        {% endblock script %}
 
     </body>
 

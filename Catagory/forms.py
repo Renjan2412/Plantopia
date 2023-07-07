@@ -14,5 +14,12 @@ class MyForm(forms.ModelForm):
 class CatagoryForm(forms.ModelForm):
     class Meta:
         model = Catagory
-        fields = ['catagory_name', 'slug', 'description', 'cat_image']        
+        fields = ['catagory_name', 'slug', 'description', 'cat_image']
+
+        widgets = {
+            'catagory_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'slug': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'cat_image': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+        }        
         

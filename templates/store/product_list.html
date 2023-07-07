@@ -19,7 +19,9 @@
         <header class="card-header">
             <div class="row gx-3">
                 <div class="col-lg-4 col-md-6 me-auto">
-                    <input type="text" placeholder="Search..." class="form-control">
+                    <form action="{% url 'search' %}" method="GET">  
+                        <input type="text" placeholder="Search..." class="form-control" name="keyword">
+                    </form>
                 </div>
                 <div class="col-lg-2 col-6 col-md-3">
                     <select class="form-select">
@@ -48,10 +50,10 @@
                         <div class="info-wrap">
                             <a href="#" class="title text-truncate">{{ Product.product_name }}</a>
                             <div class="price mb-2">$ {{ Product.price }}</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
+                            <a href="{% url 'update_product' Product.id %}" class="btn btn-sm font-sm rounded btn-brand">
                                 <i class="material-icons md-edit"></i> Edit
                             </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
+                            <a href="{% url 'delete_product' Product.id %}" class="btn btn-sm font-sm btn-light rounded">
                                 <i class="material-icons md-delete_forever"></i> Delete
                             </a>
                         </div>

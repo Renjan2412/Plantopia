@@ -77,9 +77,15 @@ class UserProfile(models.Model) :
     city = models.CharField(blank=True, max_length=50)
     state = models.CharField(blank=True, max_length=50)
     country = models.CharField(blank=True, max_length=50)
+    phone = models.CharField(max_length=20,blank=True,null=True)
+    post_code = models.CharField(max_length=15,blank=True)
+    default_addr = models.BooleanField(default=False)
 
     def __str__(self) :
         return self.user.first_name
+    
+    def full_name(self) :
+        return f'{self.first_name} {self.last_name}'
     
     def full_address(self) :
         return f'{self.address_line_1} {self.address_line_2}'

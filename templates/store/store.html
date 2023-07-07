@@ -6,8 +6,12 @@
     <div class="page-header breadcrumb-wrap">
         <div class="container">
             <div class="breadcrumb">
+                {% if 'search' in request.path %}
+                <h4 >Search Result</h4>
+                {% else %}
                 <a href="index.html" rel="nofollow">Home</a>
                 <span></span> Shop
+                {% endif %}
             </div>
         </div>
     </div>
@@ -61,6 +65,7 @@
                         </div>
                     </div>
                     <div class="row product-grid-3">
+                        {% if products %}
                         {% for Product in products %}
                         <div class="col-lg-4 col-md-4 col-12 col-sm-6">
                             <div class="product-cart-wrap mb-30">
@@ -102,6 +107,11 @@
                             </div>
                         </div>
                         {% endfor %}
+                        {% else %}
+                        <div>
+                            <h3>No result found...! try again...</h3>
+                        </div>
+                        {% endif %}
                         {% comment %} <div class="col-lg-4 col-md-4 col-12 col-sm-6">
                             <div class="product-cart-wrap mb-30">
                                 <div class="product-img-action-wrap">

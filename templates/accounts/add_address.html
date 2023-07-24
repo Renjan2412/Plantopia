@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Checkout
+                <span></span> Add Address
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="tab-content dashboard-content">
+            <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-md-12 mx-auto justify-content-center">
+                            <div class="col-md-6 mx-auto">
+                                <div class="text-center mb-25">
+                                    <h4>Billing Details</h4>
+                                </div>
+                                <form action="{% url 'add_address' %}" method="post">
+                                    {% csrf_token %}
+                                    {{ form.as_p }}
+                                    <input type="submit" value="Save" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

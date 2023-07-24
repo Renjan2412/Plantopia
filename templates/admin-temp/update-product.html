@@ -1,0 +1,90 @@
+{% extends 'admin-temp/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-md-12 mt-4 d-flex justify-content-center" style=" background-color: white; padding: 20px;">
+    <div class="row">
+        <div class="col-6">
+            <div class="content-header">
+                <form enctype="multipart/form-data" method="POST" >
+                    {% csrf_token %}
+                    <h6 class="content-title" style="text-align: center;">Update Product</h6>
+                    <div class="mb-4">
+                        <label class="form-label">Category</label>
+                       {{ form.catagory }}
+                        {% if form.errors.catagory %}
+                            <label class="text-danger">{{ form.errors.catagory }}</label>
+                        {% endif %} 
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        {{ form.product_name }}
+                        {% if form.errors.product_name %}
+                        <label  class="text-danger">{{ form.errors.product_name }}</label>
+                        {% endif %}
+                        
+                    </div>
+                    <div class="mb-3">
+                         <label for="slug" class="form-label">Slug</label> 
+                        {{form.slug}}
+                        {% if form.errors.slug %}
+                        <label  class="text-danger">{{form.errors.slug}}</label>
+                        {% endif %}
+                        
+                    </div> 
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Images</label>
+                        {{form.images}}
+                        {% if form.errors.images%}
+                        <label  class="text-danger">{{form.errors.images}}</label>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        {{form.price}}
+                        {% if form.errors.price %}
+                        <label  class="text-danger">{{ form.errors.price }}</label>
+                        {% endif %}
+                    </div>
+                     <div class="mb-3">
+                        <label for="stock" class="form-label">Stock</label>
+                        {{form.stock}}
+                        {% if form.errors.stock %}
+                        <label  class="text-danger">{{ form.errors.stock }}</label>
+                        {% endif %}
+                    </div> 
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <div class="form-floating">
+                        
+                        {{form.description}}
+                        {% if form.errors.description%}
+                        <label  class="text-danger">{{form.errors.description}}</label>
+                        {% endif %}
+                        </div>   
+                    </div>
+                    <div class="mb-3">
+                        {{form.is_available}}
+                        {% if form.errors.is_available%}
+                        <label  class="text-danger">{{form.errors.is_available}}</label>
+                        {% endif %}
+                        <label class="form-check-label" for="">
+                            Is available
+                        </label>
+                    </div>
+
+                    {{ image_form.management_form }} 
+                    {% for form in image_form %}
+                        {{ form.as_p }}
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Update Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -2,178 +2,120 @@
 {% load static %}
 {% block content %}
 
+<div class="container" style="margin-top: 50px;">
+    <center><i class="fas fa-check-circle" style="font-size: 72px;margin-bottom: 20px;color: #28A745;"></i></center>
+    <h2 class="text-center">Payment Successful</h2>
+	<br>
+	<div class="text-center">
+		<a href="{% url 'store' %}" class="btn btn-success">Shop more</a>
+	</div>
+</div>
 
-
-
-<main class="main" id="address-block">
-    <div class="page-header breadcrumb-wrap">
-        <div class="container">
-            <div class="breadcrumb">
-                <a href="index.html" rel="nofollow">Home</a>
-                <span></span> Shop
-                <span></span> Checkout
-                <span></span>Payments
-                <span></span>Order Success
-            </div>
-        </div>
-    </div>
-    <section class="mt-50 mb-50">
-
-       
-         
-
-        <div class="container">
-            <form action="" method='POST' id='form-sub'>
-                {% csrf_token %}
-                <h4 class="text-center mb-10">Order Success</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <style>
-                            .card {
-                              margin-bottom: 20px; 
-                            }
-                          </style>
-                        <div class="card">
-                            <div class="card-header">
-                              Billing Adrress
-                            </div>
-                            <div class="card-body">
-                              
-                              <p class="card-text mb-0">{{ address.first_name }}</p>
-                              <p class="card-text mb-0">{{ address.address_line_1 }}</p>
-                              <p class="card-text mb-0">{{ order.city }} , {{ order.state }}</p>
-                              <p class="card-text mb-0">{{ order.country }}</p>
-                              <p class="card-text mb-0">{{ order.email }}</p>
-                              <p class="card-text mb-0">{{ order.phone_number }}</p>
-                              {% if order.order_note %}
-                                <b>Order Note : </b> {{ order.order_note }}
-                              {% endif %}
-                              
-                            </div>
-                          </div>
-                          <div class="card">
-                            <div class="card-header">
-                              Payment Method
-                            </div>
-                            <div class="card-body">
-                              
-                              <p class="card-text">Cash On Delivery</p>
-                              
-                            </div>
-                          </div>
-                          <div class="card">
-                            <div class="card-header">
-                              Review Products
-                            </div>
-                            <div class="card-body">
-                              
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th colspan="2">Product</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for cart_item in cart_items %}
-                                            <tr>
-                                                <td class="image product-thumbnail"><img src="{{ cart_item.product.images.url }}" alt="#"></td>
-                                                <td>
-                                                    <h5><a href="shop-product-full.html">{{ cart_item.product.product_name }}</a></h5> 
-                                                    <span class="product-qty">x {{ cart_item.quantity }}</span>
-                                                </td>
-                                                <td>${{ cart_item.sub_total }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>        
-                              
-                            </div>
-                          </div>
-                        
-                        
-                        
-                    </div>
-                    
-                        <div class="col-md-6">
-                            <div class="order_review">
-                                <div class="mb-20">
-                                    <h4>Your Orders</h4>
-                                </div>
-                            <div class="table-responsive order_table text-center">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th colspan="2">Product</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for cart_item in cart_items %}
-                                            <tr>
-                                                <td class="image product-thumbnail"><img src="{{ cart_item.product.images.url }}" alt="#"></td>
-                                                <td>
-                                                    <h5><a href="shop-product-full.html">{{ cart_item.product.product_name }}</a></h5> 
-                                                    <span class="product-qty">x {{ cart_item.quantity }}</span>
-                                                </td>
-                                                <td>${{ cart_item.sub_total }}</td>
-                                            </tr>
-                                        {% endfor %}
-        
-                                            <tr>
-                                                <th>SubTotal</th>
-                                                <td class="product-subtotal" colspan="2">${{ total }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>GST</th>
-                                                <td colspan="2"><em>${{ GST }}</em></td>
-                                            </tr>
-                                            <tr>
-                                                <th>Total</th>
-                                                <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900">${{ grand_total }}</span></td>
-                                            </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-                            {% comment %} <div class="payment_method">
-                                <div class="mb-25">
-                                    <h5>Payment</h5>
-                                </div>
-                                <div class="payment_option">
-                                    
-                                    <div class="custome-radio">
-                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" checked="">
-                                        <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#checkPayment" aria-controls="checkPayment">Cash On Delivery</label>
-                                        <div class="form-group collapse in" id="checkPayment">
-                                            <p class="text-muted mt-5">Please send your cheque to Store Name, Store Street, Store Town, Store State / County, Store Postcode. </p>
-                                        </div>
-                                    </div>
-                                    <div class="custome-radio">
-                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5" checked="">
-                                        <label class="form-check-label" for="exampleRadios5" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Paypal</label>
-                                        <div class="form-group collapse in" id="paypal">
-                                            <p class="text-muted mt-5">Pay via PayPal; you can pay with your credit card if you don't have a PayPal account.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> {% endcomment %}
-                            
-                               <!--paypal button will load--> 
-                               {% comment %} <button id="paypal-button-container" value="{{cart}}" name="submit" class="btn btn-fill-out btn-block mt-30">
-                                <span class="btn-text">Place Order</span>
-                                <span class="btn-hover-text">Proceed</span>
-                               </button>  {% endcomment %}
-                            
+<div class="container" style="margin: 0 auto;width: 50%;padding: 50px;background: #f1f1f1;margin-top: 50px;margin-bottom: 50px;">
+    <div class="row invoice row-printable">
+        <div class="col-md-12">
+            <!-- col-lg-12 start here -->
+            <div class="panel panel-default plain" id="dash_0">
+                <!-- Start .panel -->
+                <div class="panel-body p30">
+                    <div class="row">
+                        <!-- Start .row -->
+                        <div class="col-lg-6">
+                            <!-- col-lg-6 start here -->
+                            <div class="invoice-logo"><img src="{% static 'assets/imgs/theme/plantopia.png' %}" alt="Invoice logo" style="max-height: 80px;"></div>
                         </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </section>
-</main>
- 
+                        <!-- col-lg-6 end here -->
+                        <div class="col-lg-6 text-end">
+                            <!-- col-lg-6 start here -->
+                            <div class="invoice-from">
+                                <ul class="list-unstyled">
+                                    <li><strong>Invoiced To</strong></li>
+                                    <li>{{order.address.first_name}}</li>
+                                    <li>{{order.address.last_name}}</li>
+                                    <li>{{order.address.full_address}}</li>
+                                    <li>{{order.address.city}}, {{order.address.state}}</li>
+                                    <li>{{order.address.country}}</li>
+                                    <li>{{order.address.postcode}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- col-lg-6 end here -->
+                        <div class="col-lg-12">
+                            <!-- col-lg-12 start here -->
+                            <div class="invoice-details mt25">
+                                <div class="well">
+                                    <ul class="list-unstyled mb0">
+                                        <li><strong>Order</strong> #{{ order_id}}</li>
+                                        <li><strong>Payment Method</strong> #{{ payment}}</li>
+                                        {% comment %} <li><strong>Transaction ID</strong> {{transID}}</li> {% endcomment %}
+                                        {% comment %} <li><strong>Order Date:</strong> {{order.order_date}}</li>
+                                        <li><strong>Status:</strong> {{payment.status}}</li> {% endcomment %}
+                                    </ul>
+                                </div>
+                            </div>
 
+                            <div class="invoice-items">
+                                <div class="table-responsive" style="overflow: hidden; outline: none;" tabindex="0">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="per70 text-center">Products</th>
+                                                <th class="per5 text-center">Qty</th>
+                                                <th class="per5 text-center">Unit Price</th>
+                                                <th class="per25 text-center">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                          {% for item in ordered_products %}
+                                            <tr>
+                                                <td>{{item.product.product_name}}
+                                                    
+                                                </td> 
+                                                
+                                                <td class="text-center">{{item.quantity}}</td>
+                                                
+                                                <td class="text-center">₹{{item.product_price}}</td>
+                                                <td class="text-center">₹{{item.total}}</td>
+                                            </tr>
+                                          {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="3" class="text-right">Sub Total:</th>
+                                                <th class="text-center">₹{{sub_total}}</th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="3" class="text-right">Tax:</th>
+                                                <th class="text-center">₹{{order.tax}}</th>
+                                            </tr>
+                                            {% if discount != 0 %}
+                                            <tr>
+                                                <th colspan="3" class="text-right">Coupon discount</th>
+                                                <th class="text-center">₹{{discount}}</th>
+                                            </tr>
+                                            {% endif %}
+                                            <tr>
+                                                <th colspan="3" class="text-right">Grand Total:</th>
+                                                <th class="text-center">₹{{order.order_total}}</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="invoice-footer mt25">
+                                <p class="text-center">Thank you for shopping with us!</p>
+                            </div>
+                        </div>
+                        <!-- col-lg-12 end here -->
+                    </div>
+                    <!-- End .row -->
+                </div>
+            </div>
+            <!-- End .panel -->
+        </div>
+        <!-- col-lg-12 end here -->
+    </div>
+</div> 
 
 
 {% endblock content %}

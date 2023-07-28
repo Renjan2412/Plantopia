@@ -5,7 +5,7 @@ from store.models import Product
 from carts.models import Cart,CartItem,Address
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-from accounts.models import Account,UserProfile
+from accounts.models import Account
 from accounts.forms import UserProfileForm
 from django.http import JsonResponse
 from .forms import AddressForm

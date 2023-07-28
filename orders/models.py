@@ -6,6 +6,10 @@ from store.models import Product
 # Create your models here.
 
 class Payment(models.Model) :
+    PAYMENT_METHOD_CHOICES = (
+        ("cash", "Cash"),
+        ("Razorpay", "Razorpay"),
+    )
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     payment_id = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100)
@@ -14,13 +18,14 @@ class Payment(models.Model) :
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.payment_id
+        return f"{self.payment_method} - {self.amount_paid}"
     
 
 class Order(models.Model) :
     STATUS = (
-        ('New' , 'New'),
-        ('Accepted' , 'Accepted'),
+        ('Delivered' , 'Delivered'),
+        ('Shipped' , 'Shipped'),
+        ('Pending' , 'Pending'),
         ('Completed' , 'Completed'),
         ('Cancelled' , 'Cancelled'),
     )   
@@ -47,27 +52,50 @@ class Order(models.Model) :
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) 
 
-    def full_name(self) :
-        return f'{self.first_name} {self.last_name}'
+    class Meta:
+        ordering = ["-is_orderd"]
+
+    def __str__(self):
+        return f"Order {self.id} by {self.user}"
+
+    # def full_name(self) :
+    #     return f'{self.first_name} {self.last_name}'
     
-    def full_address(self) :
-        return f'{self.address_line_1} , {self.address_line_2}'
+    # def full_address(self) :
+    #     return f'{self.address_line_1} , {self.address_line_2}'
     
-    def __str__(self) :
-        return self.first_name
+    # def __str__(self) :
+    #     return self.first_name
     
 class OrderProduct(models.Model) :
     order = models.ForeignKey(Order , on_delete=models.CASCADE)
     payment = models.ForeignKey(Payment , on_delete=models.SET_NULL , blank=True , null=True)
     user = models.ForeignKey(Account , on_delete=models.CASCADE)
     product = models.ForeignKey(Product , on_delete=models.CASCADE)
+    address = models.ForeignKey(Address,on_delete=models.CASCADE) 
     quantity = models.IntegerField()
     product_price = models.FloatField()
     orderd = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
+    status = models.CharField(max_length=255, default="pending")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) :
-        return self.product.product_name
+         return self.product.product_name
+
+    # order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    # product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_products")
+    # address = models.ForeignKey(Address,on_delete=models.CASCADE,default=0)
+    # quantity = models.IntegerField()
+    # product_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    # ordered = models.BooleanField(default=False)
+    # is_paid = models.BooleanField(default=False)
+    # status = models.CharField(max_length=255, default="pending")
+    # payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name="order_products" )
+    # user = models.ForeignKey(CustomUser , on_delete=models.CASCADE, related_name="order_products")
+
+    # def __str__(self):
+    #     return f"{self.product} - {self.quantity}"
         
 

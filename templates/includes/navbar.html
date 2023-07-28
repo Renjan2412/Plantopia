@@ -7,8 +7,8 @@
                 <div class="col-xl-3 col-lg-4">
                     <div class="header-info">
                         <ul>
-                            <li><i class="fi-rs-smartphone"></i> <a href="#">(+01)
-                                    - 2345 - 6789</a></li>
+                            <li><i class="fi-rs-smartphone"></i> <a href="#" style="display: inline;">(+91)-9633327588</a></li>
+
                             <li><i class="fi-rs-marker"></i><a
                                     href="{% static 'page-contact.html' %}">Our
                                     location</a></li>
@@ -34,7 +34,7 @@
                 <div class="col-xl-3 col-lg-4">
                     <div class="header-info header-info-right">
                         <ul>
-                            <li>
+                            {% comment %} <li>
                                 <a class="language-dropdown-active" href="#"> <i
                                         class="fi-rs-world"></i> English <i
                                         class="fi-rs-angle-small-down"></i></a>
@@ -48,8 +48,8 @@
                                     <li><a href="#"><img
                                                 src="{% static 'assets/imgs/theme/flag-ru.png' %}"
                                                 alt>Pусский</a></li>
-                                </ul>
-                            </li>
+                                </ul> 
+                            </li> {% endcomment %}
                             {% if user.id is none %}
                             <li>Wlelcome User</li>
                             <li><i class="fi-rs-user"></i><a href="{% url 'user_login' %}">Log In</a>

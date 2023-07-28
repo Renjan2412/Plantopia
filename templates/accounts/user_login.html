@@ -23,7 +23,7 @@
                                     <div class="form-group">
                                         <input required="" type="password" name="password" placeholder="Password">
                                     </div>
-                                    <div class="login_footer form-group">
+                                    {% comment %} <div class="login_footer form-group">
                                         <div class="chek-form">
                                             <div class="custome-checkbox">
                                                 <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="">
@@ -31,7 +31,7 @@
                                             </div>
                                         </div>
                                         <a class="text-muted" href="{% url 'forgotPassword' %}">Forgot password?</a>
-                                    </div>
+                                    </div> {% endcomment %}
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Log in</button>
                                     </div>

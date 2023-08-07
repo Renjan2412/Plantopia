@@ -75,38 +75,7 @@
                     <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
                     <div class="row mb-50">
                         <div class="col-lg-6 col-md-12">
-                            {% comment %} <div class="heading_s1 mb-3">
-                                <h4>Calculate Shipping</h4>
-                            </div>
-                            <p class="mt-15 mb-30">Flat rate: <span class="font-xl text-brand fw-900">5%</span></p>
-                            <form class="field_form shipping_calculator">
-                                <div class="form-row">
-                                    <div class="form-group col-lg-12">
-                                        <div class="custom_select">
-                                            <select class="form-control select-active">
-                                                <option value="">Choose a option...</option>
-                                                <option value="AX">Aland Islands</option>
-                                                <option value="AF">Afghanistan</option>
-                                                <option value="AL">Albania</option>
-                                                
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-row row">
-                                    <div class="form-group col-lg-6">
-                                        <input required="required" placeholder="State / Country" name="name" type="text">
-                                    </div>
-                                    <div class="form-group col-lg-6">
-                                        <input required="required" placeholder="PostCode / ZIP" name="name" type="text">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-lg-12">
-                                        <button class="btn  btn-sm"><i class="fi-rs-shuffle mr-10"></i>Update</button>
-                                    </div>
-                                </div>
-                            </form> {% endcomment %}
+                            
                             <div class="mb-30 mt-50">
                                 <div class="heading_s1 mb-3">
                                     <h4>Apply Coupon</h4>
@@ -170,8 +139,11 @@
         </div>
     </section>
 </main>
+
+
+
 <!-- Include jQuery library -->
-{% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
       // Get the CSRF token
@@ -287,12 +259,11 @@
         return cookieValue;
       }
     });
-  </script> {% endcomment %}
+  </script> 
+ 
+  {% endblock content %} 
   
-  
 
   
 
 
-
-{% endblock %}

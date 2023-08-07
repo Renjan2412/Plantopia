@@ -116,6 +116,9 @@ def cart(request):
 
         GST = (5 * total) / 100
         grand_total = total + GST
+        print('type:' ,type(total))
+        print('type:' ,type(GST))
+        print('type:' ,type(grand_total))
 
     except ObjectDoesNotExist:
         pass
@@ -150,6 +153,9 @@ def update_cart(request, product_id):
             total = sum(item.product.price * item.quantity for item in cart_items)
             GST = (5 * total) / 100
             grand_total = total + GST
+            print('type:' ,type(total))
+            print('type:' ,type(GST))
+            print('type:' ,type(grand_total))
 
             data = {
                 "success": True,
@@ -158,6 +164,8 @@ def update_cart(request, product_id):
                 "GST": GST,
                 "grand_total": grand_total
             }
+            print('data: ',data)
+            
             return JsonResponse(data)
         except CartItem.DoesNotExist:
             data = {"success": False, "message": "Cart item not found."}

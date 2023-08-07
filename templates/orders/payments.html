@@ -81,7 +81,7 @@
                                                     <h5><a href="shop-product-full.html">{{ cart_item.product.product_name }}</a></h5> 
                                                     <span class="product-qty">x {{ cart_item.quantity }}</span>
                                                 </td>
-                                                <td>${{ cart_item.sub_total }}</td>
+                                                <td>₹{{ cart_item.sub_total }}</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -121,15 +121,15 @@
         
                                             <tr>
                                                 <th>SubTotal</th>
-                                                <td class="product-subtotal" colspan="2">${{ total }}</td>
+                                                <td class="product-subtotal" colspan="2">₹{{ total }}</td>
                                             </tr>
                                             <tr>
                                                 <th>GST</th>
-                                                <td colspan="2"><em>${{ GST }}</em></td>
+                                                <td colspan="2"><em>₹{{ GST }}</em></td>
                                             </tr>
                                             <tr>
                                                 <th>Total</th>
-                                                <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900">${{ grand_total }}</span></td>
+                                                <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900">₹{{ grand_total }}</span></td>
                                             </tr>
                                     </tbody>
                                 </table>

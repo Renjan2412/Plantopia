@@ -26,7 +26,7 @@ class Order(models.Model) :
         ('Delivered' , 'Delivered'),
         ('Shipped' , 'Shipped'),
         ('Pending' , 'Pending'),
-        ('Completed' , 'Completed'),
+        ('Out for Delivery' , 'Out for Delivery'),
         ('Cancelled' , 'Cancelled'),
     )   
 
@@ -34,19 +34,10 @@ class Order(models.Model) :
     payment = models.ForeignKey(Payment , on_delete=models.SET_NULL , blank=True ,null=True)
     order_number = models.CharField(max_length=20)
     address=models.ForeignKey(Address, on_delete=models.SET_NULL , blank=True ,null=True)
-    # first_name = models.CharField(max_length=50)
-    # last_name = models.CharField(max_length=50)
-    # phone_number = models.CharField(max_length=15)
-    # email = models.EmailField(max_length=20)
-    # address_line_1 = models.CharField(max_length=100)
-    # address_line_2 = models.CharField(max_length=100 , blank=True)
-    # country = models.CharField(max_length=50,blank=True)
-    # state = models.CharField(max_length=50)
-    # city = models.CharField(max_length=50)
     order_note = models.CharField(max_length=200 , blank=True)
     order_total = models.FloatField()
     GST = models.FloatField()
-    status = models.CharField(max_length=10 , choices=STATUS , default='New')
+    status = models.CharField(max_length=20 , choices=STATUS , default='New')
     ip = models.CharField(blank=True , max_length=20)
     is_orderd = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

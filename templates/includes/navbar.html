@@ -51,12 +51,12 @@
                                 </ul> 
                             </li> {% endcomment %}
                             {% if user.id is none %}
-                            <li>Wlelcome User</li>
+                            <li>Welcome User</li>   
                             <li><i class="fi-rs-user"></i><a href="{% url 'user_login' %}">Log In</a>
                                 <span>| |</span>
                           <a href="{% url 'register' %}"> Sign Up</a>  </i></li>
                           {%  else %}
-                          <li>Welcome {{user.first_name}}!</li>
+                          <li>Welcome {{user.first_name}} !</li>
                           <li><i class="fi-rs-user"></i><a href="{% url 'dashboard' %}">Dashboard</a>
                               <span>| |</span>
                         <a href="{% url 'logout' %}">Logout</a>  </i></li>
@@ -85,7 +85,7 @@
                     <div class="header-action-right">
                         <div class="header-action-2">
                             <div class="header-action-icon-2">
-                                <a href="shop-wishlist.html">
+                                <a href="{% url 'wishlist' %}">
                                     <img class="svgInject" alt="Evara"
                                         src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}">
                                     <span class="pro-count blue">4</span>

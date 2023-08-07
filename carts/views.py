@@ -9,6 +9,9 @@ from accounts.models import Account
 from accounts.forms import UserProfileForm
 from django.http import JsonResponse
 from .forms import AddressForm
+from offer.models import Coupon
+from offer.forms import CouponForm
+from django.utils import timezone
 
 # Create your views here.
 def _cart_id(request) :
@@ -20,6 +23,14 @@ def _cart_id(request) :
 @login_required(login_url='user_login')
 def add_cart(request , product_id) :
     product = Product.objects.get(id=product_id)  # to get the product
+    # Get or create a cart for the user
+    cart, created = Cart.objects.get_or_create(cart_id=_cart_id(request))
+    if created:
+        cart.save()
+
+    # Associate the user with the cart
+    cart.user = request.user
+    cart.save()
     try:
         cart = Cart.objects.get(cart_id = _cart_id(request))
     except Cart.DoesNotExist :
@@ -74,6 +85,8 @@ def cart(request):
     cart_items = None
     GST = 0
     grand_total = 0
+    coupon_form = CouponForm(request.POST or None)
+    context = {}
 
     try:
         if request.user.is_authenticated:
@@ -87,8 +100,23 @@ def cart(request):
             total += cart_item.sub_total
             quantity += cart_item.quantity
 
+        
+
+        if request.method == 'POST' and coupon_form.is_valid() :
+            coupon_code = coupon_form.cleaned_data['coupon_code']
+            try :
+                coupon = Coupon.objects.get(code=coupon_code, active=True)
+                if coupon.valid_from <= timezone.now() <= coupon.valid_to :
+                    discount_percentage = coupon.discount_amount
+                    discount = (discount_percentage / 100) * total
+                    grand_total -= discount
+                    context['applied_coupon'] = coupon
+            except Coupon.DoesNotExist :
+                context['coupon_error'] = 'Invalid coupon code..'
+
         GST = (5 * total) / 100
         grand_total = total + GST
+
     except ObjectDoesNotExist:
         pass
 
@@ -98,7 +126,10 @@ def cart(request):
         'cart_items': cart_items,
         'GST': GST,
         'grand_total': grand_total,
+        'coupon_form' : coupon_form,
     }
+    # if request.method == 'POST' and coupon_form.is_valid():
+    #     return redirect('cart')
     return render(request, 'store/cart.html', context)
 
 
@@ -152,6 +183,7 @@ def calculate_total(request):
 
 
 class CheckoutView(View):
+    # @login_required
     def get(self, request):
         GST = 0
         grand_total = 0
@@ -167,6 +199,7 @@ class CheckoutView(View):
             
             
             context = {
+                
                 'cart_items': cart_items,
                 'address': address,
                 'total_total': subtotal,
@@ -175,6 +208,11 @@ class CheckoutView(View):
                 'grand_total':grand_total,
             }
             print("####",context)
+
+            # storing GST into session 
+
+            # request.session['order_GST'] = GST
+            # request.session['total_total'] = subtotal
 
             return render(request, 'store/checkout.html', context)
         except Cart.DoesNotExist:

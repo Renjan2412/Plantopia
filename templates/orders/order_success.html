@@ -30,12 +30,11 @@
                             <div class="invoice-from">
                                 <ul class="list-unstyled">
                                     <li><strong>Invoiced To</strong></li>
-                                    <li>{{order.address.first_name}}</li>
-                                    <li>{{order.address.last_name}}</li>
+                                    <li>{{order.address.first_name}} {{ order.address.last_name }}</li>
                                     <li>{{order.address.full_address}}</li>
                                     <li>{{order.address.city}}, {{order.address.state}}</li>
                                     <li>{{order.address.country}}</li>
-                                    <li>{{order.address.postcode}}</li>
+                                    <li>{{order.address.post_code}}</li>
                                 </ul>
                             </div>
                         </div>
@@ -48,8 +47,8 @@
                                         <li><strong>Order</strong> #{{ order_id}}</li>
                                         <li><strong>Payment Method</strong> #{{ payment}}</li>
                                         {% comment %} <li><strong>Transaction ID</strong> {{transID}}</li> {% endcomment %}
-                                        {% comment %} <li><strong>Order Date:</strong> {{order.order_date}}</li>
-                                        <li><strong>Status:</strong> {{payment.status}}</li> {% endcomment %}
+                                        <li><strong>Order Date:</strong> {{order.created_at}}</li>
+                                        {% comment %} <li><strong>Status:</strong> {{payment.status}}</li> {% endcomment %} 
                                     </ul>
                                 </div>
                             </div>
@@ -62,41 +61,42 @@
                                                 <th class="per70 text-center">Products</th>
                                                 <th class="per5 text-center">Qty</th>
                                                 <th class="per5 text-center">Unit Price</th>
-                                                <th class="per25 text-center">Total</th>
+                                                <th class="per25 text-center">Total</th> 
                                             </tr>
                                         </thead>
                                         <tbody>
                                           {% for item in ordered_products %}
                                             <tr>
-                                                <td>{{item.product.product_name}}
-                                                    
+                                                <td>
+                                                  {{item.product.product_name}}      
                                                 </td> 
                                                 
                                                 <td class="text-center">{{item.quantity}}</td>
                                                 
                                                 <td class="text-center">₹{{item.product_price}}</td>
-                                                <td class="text-center">₹{{item.total}}</td>
+                                                
+                                                <td class="text-center">₹{{item.total_quantity}}</td> 
                                             </tr>
                                           {% endfor %}
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th colspan="3" class="text-right">Sub Total:</th>
-                                                <th class="text-center">₹{{sub_total}}</th>
+                                                <th colspan="3" class="text-right"><strong>Sub Total:</strong></th>
+                                                <th class="text-center">₹{{subtotal}}</th>
                                             </tr>
                                             <tr>
-                                                <th colspan="3" class="text-right">Tax:</th>
-                                                <th class="text-center">₹{{order.tax}}</th>
+                                                <th colspan="3" class="text-right"><strong>GST:</strong></th>
+                                                <th class="text-center">₹{{GST}}</th>
                                             </tr>
                                             {% if discount != 0 %}
                                             <tr>
-                                                <th colspan="3" class="text-right">Coupon discount</th>
+                                                <th colspan="3" class="text-right"><strong>Coupon discount</strong></th>
                                                 <th class="text-center">₹{{discount}}</th>
                                             </tr>
                                             {% endif %}
                                             <tr>
-                                                <th colspan="3" class="text-right">Grand Total:</th>
-                                                <th class="text-center">₹{{order.order_total}}</th>
+                                                <th colspan="3" class="text-right"><strong>Grand Total:</strong></th>
+                                                <th class="text-center">₹{{grand_total}}</th>
                                             </tr>
                                         </tfoot>
                                     </table>

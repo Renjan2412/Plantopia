@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 import razorpay
-from carts.models import Address, CartItem
+from carts.models import Address, CartItem,Cart
 # from .forms import OrderForm
 from .models import Order,Payment,OrderProduct
 import datetime
@@ -77,18 +77,17 @@ def order(request):
     if request.method == 'POST':
         print('hiiiiiiiiiiii')
         payment_method = request.POST.get('paymentmethod')
-        amount=request.POST.get('grandPriceText')
-        print(amount)
-        grand_total = amount
-
         
+
         
         if payment_method == "Razor Pay":
             client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
 
             amount=request.POST.get('grandPriceText')
             print('type of amount : ', type(amount))
-            grand_total = round(float(amount))
+            print(amount)
+            grand_total = float(amount)
+
             
 
 # Print the datatype
@@ -97,14 +96,17 @@ def order(request):
 
             print(razor_payment)
             print(razor_payment['id'])
-            print("abhilash")
+            
             cart_items = CartItem.objects.filter(user=request.user)
             address_id = request.POST.get('addressID') 
-            print("abhilash1")  
+
+            GST = request.session.get('order_GST' , 0)
+            
+              
             # address_details = Address.objects.get(id=address)
             address = get_object_or_404(Address, pk= address_id)
             print("address_id :", address_id)
-            print("abhilash3")
+            
 
             payment = Payment.objects.create(
                 user=request.user,
@@ -113,7 +115,7 @@ def order(request):
             )
             payment.save()
 
-            print("abhilash4")
+            
 
 
             order = Order.objects.create(
@@ -121,11 +123,12 @@ def order(request):
                 payment=payment,
                 address=address,
                 order_total=grand_total,
-                status="New",
-                GST="6"
+                status="Pending",
+                GST=GST,
+                
             )
             order.save()
-            print('abhilash5')
+            
 
             for cart_item in cart_items:
                 ordered_product = OrderProduct.objects.create(
@@ -137,24 +140,27 @@ def order(request):
                     is_paid=False,
                     payment=payment,
                     user=request.user,
-                    address=order.address,                  
+                    address=order.address,
+                    # GST=order.GST,
+                                      
                 )
-                print('abhilash6')
+                
 
 
 
                 product = cart_item.product
                 product.stock -= cart_item.quantity
                 product.save()
-                print('abhilash7')
+                
                 
             response_data = {'order_id': ordered_product.id,
                              'payment_id': razor_payment['id'],
                              'amount_paid': razor_payment['amount'],
                              'key': settings.KEY,
-                             'orders_id':order.id
+                             'orders_id':order.id,
+                             
                              }
-            print('abhilash8')
+            
           
             return JsonResponse({'response': response_data})
         
@@ -164,13 +170,15 @@ def order(request):
             cart_items = CartItem.objects.filter(user=request.user)
             address_id = request.POST.get('addressID')
             address = get_object_or_404(Address, pk= address_id)
-            amount_paid =request.POST.get('grandPriceText'),
-            print('amount : ', amount_paid)
+            amount =request.POST.get('grandPriceText')
+            print('amount : ', amount)
+            grand_total = float(amount)
+            GST = request.session.get('order_GST' , 0)
 
             payment = Payment.objects.create(
                 user=request.user,
                 payment_method=request.POST.get('paymentmethod'),
-                amount_paid=grand_total,
+                amount_paid=request.POST.get('grandPriceText'),
             )
             payment.save()
             print('payment successful')
@@ -180,8 +188,9 @@ def order(request):
                 payment=payment,
                 address=address,
                 order_total=grand_total,
-                status="New",
-                GST="6"
+                status="Pending",
+                GST=GST,
+                
             )
             order.save()
             print('order successful')
@@ -200,6 +209,7 @@ def order(request):
                     user=request.user,
                     address=order.address,
                     
+                    
                 )
 
                 product = cart_item.product
@@ -215,15 +225,26 @@ def order(request):
 
 
 
+def calculate_total(request):
+    cart_items = CartItem.objects.filter(user=request.user)
+    total = sum(item.sub_total() for item in cart_items)
+    return total
+
+
 
 
 def order_success(request):
+    GST = 0
+    grand_total = 0
+    total = 0
     order_id = request.GET.get('order_id')
   
     orders_id = request.GET.get('orders')
     print(orders_id)
     ordered_products = OrderProduct.objects.filter(order_id=orders_id)  
-    order = Order.objects.get(id=order_id)           
+    print(ordered_products)
+
+    order = OrderProduct.objects.get(id=order_id)           
     # order = get_object_or_404(Orders, id=order_id)
     # order = OrderProduct.objects.get(id=order_id)
     print(order)
@@ -234,29 +255,110 @@ def order_success(request):
     selling_price = product_dict['price']
     # Retrieve other fields from the OrderProduct model
     user = order.user
+    print(user)
+    
     address = order.address
-    ordered = order.is_orderd
+    # ordered = order.is_orderd
     is_paid = OrderProduct.is_paid
     status = order.status
     quantity = OrderProduct.quantity
-    payment = order.payment      
+    payment = order.payment 
+
+    # GST= order.GST
+
+    
+    cart = Cart.objects.filter(user=request.user)
+    print("3333333333333333333")
+    print(cart)
+    for item in ordered_products:
+        item.total_quantity = item.quantity * item.product_price
+
+
+    
+    subtotal = calculate_total(request)   
+    GST = (5 * subtotal)/100
+    grand_total = subtotal + GST
+
     context = {
         'order' : order,
         'order_id': order_id,
         'quantity': quantity,
         'product_price':selling_price,
         'product_name': product_dict['product_name'],
-        'ordered':ordered,
+        # 'ordered':ordered,
         'is_paid':is_paid,
-        'user': str(user),
+        'user': user,
         'address':address,
+        'GST':GST,
         'status':status,
         'product':product,
         'payment':payment,
         'image_url':product_image,
         'ordered_products': ordered_products,
-    }                                    
-    return render(request,'orders/order_success.html',context)       
+        'subtotal':subtotal,
+        'grand_total': grand_total,
+        
 
+    }                                    
+    return render(request,'orders/order_success.html',context)  
+
+def orderpage(request) :
+    orders = Order.objects.all().order_by("-created_at")
+    return render(request, "admin-temp/orderpage.html", {"orders": orders})
+
+def order_deatils(request,id) :
+    
+    order = get_object_or_404(Order, id=id)
+    order_items = OrderProduct.objects.filter(order__id=id)
+    context = {
+        'order_items':order_items,
+        'order':order,
+    }
+
+    return render(request,'admin-temp/order_details.html',context)
+
+def edit_order(request, id):
+    if request.method == "POST":
+        status = request.POST.get("status")
+        try:
+        
+            order = Order.objects.get(pk=id)
+            order.status = status
+            order.save()
+            if status == 'Delivered':
+                pyment=order.payment
+                pyment.status='Success'
+                pyment.save()
+
+
+        except Order.DoesNotExist:
+            pass
+    return redirect("orderpage")
+
+
+# def cancel_product(request):
+#     if request.method == 'POST':
+#         order_product_id = request.POST.get('orderproduct_id')
+        
+#         try:
+#             order_product = OrderProduct.objects.get(id=order_product_id)
+#             if order_product.status != 'Cancelled':
+#                 order_product.status = 'Cancelled'
+#                 order_product.save()
+#                 response = {'success': True, 'message': 'Product has been cancelled.'}
+#             else:
+#                 response = {'success': False, 'message': 'Product is already cancelled.'}
+#         except OrderProduct.DoesNotExist:
+#             response = {'success': False, 'message': 'Product not found.'}
+        
+#         return JsonResponse(response)
+#     else:
+#         return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+         
+def cancel_order(request,id):
+    order = Order.objects.get(pk = id)
+    order.status="cancelled"
+    order.save()
+    return redirect('user_order_details')
 
     

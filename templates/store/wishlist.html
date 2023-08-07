@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Wishlist
+            </div>
+        </div>
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container" id='wishlist-container'>
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        {% if wishlist %}
+                        <table class="table shopping-summery text-center">
+                            
+                            <thead>
+                                <tr class="main-heading">
+                                    <th scope="col" colspan="2">Product</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Stock Status</th>
+                                    <th scope="col">Action</th>
+                                    <th scope="col">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                {% for item in wishlist %}
+                                <tr>
+                                    <form action="{% url 'add_cart' item.product.id %}" method='POST'>
+                                        {% csrf_token %}
+                                    <td class="image product-thumbnail"><img src="{{item.product.images.url}}" alt="#"></td>
+                                    <td class="product-des product-name">
+                                        <h5 class="product-name"><a href="{{item.product.get_url}}">{{item.product.product_name}}</a></h5>
+                                       
+                                        </p>
+                                    </td>
+                                    <td class="price" data-title="Price"><span>₹{{item.product.price}} </span></td>
+                                    <td class="text-center" data-title="Stock">
+                                        {% if item.product.stock > 0 %}
+                                        <span class="color3 font-weight-bold">In Stock</span>
+                                        {% else %}
+                                        <span class="text-danger font-weight-bold">Out of stock</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-right" data-title="Cart">
+                                        {% comment %} <input type='hidden' name='flavour_pro' value="{{item.product_variation.flavour}}">
+                                        <input type='hidden' name='weight_pro' value="{{item.product_variation.weight}}"> {% endcomment %}
+                                        {% if item.product_variation.id in variations %}
+                                        <button type='submit' class="btn btn-sm" disabled><i class="fi-rs-shopping-bag mr-5"></i>Added</button>
+                                        {% else %}
+                                        <button type='submit' class="btn btn-sm" {% if item.product_variation.quantity <= 0 %}disabled{% endif %}><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                        {% endif %}
+                                    </td>
+                                </form>
+                                    <td class="action" data-title="Remove"><a href="#" data-wishlist-id="{{item.id}}" id='removeWishlistItem'><i class="fi-rs-trash"></i></a></td>
+                                </tr>
+                                {% endfor %}
+                                
+                                
+
+                                
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class='text-center'>
+                            <h3 class='text-center'>Wishlist is Empty</h3>
+                            <a href="{% url 'store' %}" class="btn mt-15">Continue Shoping</a>
+                        </div>
+
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+
+
+{% endblock content %}
+
+{% block script %}
+<script>
+    $(document).on('click', '#removeWishlistItem', function(e) {
+        e.preventDefault()
+        wishlistItemId = $(this).data('wishlist-id')
+        console.log('item id : ', wishlistItemId)
+        csrfToken = $('input[name="csrfmiddlewaretoken"]').val()
+        console.log('csrf token : ', csrfToken)
+
+        swal({
+            title:"Are You sure",
+            text:"Do you want to delete this item",
+            icon:"warning",
+            buttons: ['Cancel','Delete'],
+            dangerMode:true,
+        }).then(function(confirmDelete) {
+            if(confirmDelete) {
+                $.ajax({
+                    method:"POST",
+                    url:"/cart/del-wishlist-item/",
+                    data:{
+                        'wishlist_item_id':wishlistItemId,
+                        'csrfmiddlewaretoken':csrfToken,
+                    },
+                    success:function(response) {
+                        swal({
+                            title:"Deleted",
+                            text:response.message,
+                            icon:'success',
+                            timer:4000,
+                            button:false,
+                        }).then(function(){
+                            $('#wishlist-container').load(location.href + ' #wishlist-container')
+                            $('#wishlist-block').load(location.href + ' #wishlist-block')
+                        })
+                    }
+                })
+            }
+        })
+    })
+</script>
+
+
+{% endblock script %}

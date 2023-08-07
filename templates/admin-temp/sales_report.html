@@ -1,0 +1,236 @@
+{% extends 'admin-temp/base.html' %}
+
+{% load static %}
+{% block content %}
+
+<section class="content-main" id='order-block'>
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Sales Report</h2>
+        </div>
+        <div>
+            <a href="{% url 'sales_report' %}" class='btn btn-secondary'>Clear</a>
+        </div>
+        
+    </div>
+    <div class='col-md-12 d-flex justify-content-around'>
+        <div class='card col-md-4'>
+            <div class='card-header text-center'>
+                <h5>Filter by dates </h5>
+            </div>
+            <div class='card-body'>
+                <form method='POST' id='datefilterForm' action="{% url 'sales_report' %}">
+                    {% csrf_token %}
+                    <div class=''>
+                        <label for='startDate'>Start Date :</label>
+                        <input type='date' class='form-control' name='startDate' required id='startDate'>
+                    </div>
+                    <div class='mt-15'>
+                        <label for='endDate'>End Date :</label>
+                        <input type='date' class='form-control' name='endDate' required id='endDate'>
+                    </div>
+                    <div class='text-center mt-15'>
+                        <button class='btn btn-sm btn-secondary' type='submit'>Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class='card col-md-4'>
+            <div class='card-header text-center'>
+                <h5>Monthly Sales</h5>
+            </div>
+            <div class='card-body'>
+                <form method='POST' id='monthlySales' action="{% url 'monthly_sales' %}">
+                    {% csrf_token %}
+                    <div class=''>
+                        <label for='startDate'>Select Month : </label>
+                        <select class='form-select' name='month' id='selectMonth'>
+                            <option value ='' selected disabled> Select Month </option>
+                            <option value='1'>Januvary</option>
+                            <option value='2'>February</option>
+                            <option value='3'>March</option>
+                            <option value='4'>April</option>
+                            <option value='5'>May</option>
+                            <option value='6'>June</option>
+                            <option value='7'>July</option>
+                            <option value='8'>August</option>
+                            <option value='9'>September</option>
+                            <option value='10'>October</option>
+                            <option value='11'>November</option>
+                            <option value='12'>December</option>
+                        </select>
+                    </div>
+                    <div class='text-center mt-15'>
+                        <button class='btn btn-sm btn-secondary' type='submit'>Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% if orders %}
+        {% if msg != 'nothing' %}
+            <div class='card'>
+            <div class='card-header'>
+            
+                <h5 class='text-secondary'>{{msg}}</h5>
+            
+            </div>
+        
+            </div>
+        {% endif %}
+        <div class="card mb-4">
+        
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id='salesReportTable'>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-center"># ID</th>
+                            <th scope="col" class="text-center">Order Date</th>
+                            <th scope="col" class="text-center">Ordered Account</th>
+                            <th scope="col" class="text-center">Billing Name</th>
+                            <th scope="col" class="text-center">Amount</th>
+                            <th scope="col" class="text-center">Payment method</th>
+                            <th scope="col" class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for orderitem in orders %}
+                        <tr>
+                            <td class="text-center" style="vertical-align: middle">{{orderitem.id}}</td>
+                            <td class="text-center" style="vertical-align: middle">{{orderitem.created_at}}</td>
+                            <td class="text-center" style="vertical-align: middle">{{orderitem.user}}</td>
+                            <td class="text-center" style="vertical-align: middle">{{orderitem.address.full_name}}</td>
+                            <td class="text-center" style="vertical-align: middle">₹ {{orderitem.order_total}}</td>
+                            <td class="text-center" style="vertical-align: middle">{{orderitem.payment.payment_method}}</td>
+                            <td class="text-center" style="vertical-align: middle">{{orderitem.status}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> <!-- table-responsive //end -->
+        </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+            
+    {% else %}
+    <div>
+        <h4>There is no Orders during this period</h4>
+    </div>
+    {% endif %}
+</section> <!-- content-main end// -->
+
+{% endblock content %}
+
+
+{% block script %}  
+
+<script>
+
+$('#salesReportTable').DataTable({
+    paging:true,
+    pageLength:10,
+    lengthChange:true,
+    autoWidth:true,
+    searching:true,
+    bInfo:true,
+    bSort:false,
+    dom:'lBfrtip',
+    buttons: [
+        {
+            extend:'pdf',
+            text:'Download as PDF',
+            className: 'btn ',
+            titleAttr:'PDF',
+            exportOptions : {
+                columns: [0,1,2,3,4,5,6]
+            }
+        },
+        {
+            extend:'print',
+            text:'print',
+            className: 'btn ',
+            titleAttr:'print',
+            exportOptions : {
+                columns: [0,1,2,3,4,5,6]
+            }
+        },
+    ]
+})
+
+
+
+$(document).on('submit', '#datefilterForm', function(e) {
+    e.preventDefault();
+    var form = document.getElementById('')
+    var startDate = document.getElementById('startDate').value
+    var endDate = document.getElementById('endDate').value
+    var currentdate = new Date();
+    var dd = currentdate.getDate()
+    var mm = currentdate.getMonth() + 1
+    var yyyy = currentdate.getFullYear()
+    if (dd < 10) {
+        dd = '0' + dd;
+    }
+    if (mm < 10) {
+        mm = '0' + mm;
+    }
+    today = yyyy + '-' + mm + '-' + dd
+    isFormValid = true; 
+    if (startDate > endDate) {
+        swal({
+            title:'error',
+            text:'Please choose correct dates...',
+            icon:'warning',
+            
+        })
+        isFormValid = false
+    }
+    if (endDate > today) {
+        swal({
+            title:'error',
+            text:'End date cannot be in the future',
+            icon:'warning',
+            
+        })
+        isFormValid = false
+    }
+    if (isFormValid) {
+        console.log('form is valid....')
+        this.submit();
+    }
+});
+
+$(document).on('submit', '#yearlySales', function(e) {
+    e.preventDefault()
+    var year = document.getElementById('yearSelect').value;
+    console.log('year : ', year)
+    if (!year) {
+        swal({
+            text:'Please Select Year',
+            icon:'warning',
+        })
+        return
+    }
+    this.submit();
+})
+
+
+$(document).on('submit', '#monthlySales', function(e) {
+    e.preventDefault()
+    var month = document.getElementById('selectMonth').value;
+    console.log('month : ', month)
+    if (!month) {
+        swal({
+            text:'Please Select month',
+            icon:'warning',
+        })
+        return
+    }
+    this.submit();
+})
+</script>
+
+
+{% endblock script %}
+

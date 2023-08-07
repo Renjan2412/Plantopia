@@ -1,6 +1,7 @@
 from django.db import models
 from Catagory.models import Catagory
 from django.urls import reverse
+from accounts.models import Account
 
 # Create your models here.
 
@@ -31,3 +32,10 @@ class Picture(models.Model):
 
     def __str__(self):
         return self.image.url
+    
+class Wishlist(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+
+    def __str__(self):
+       return f"{self.user} - {self.product.product_name}"    

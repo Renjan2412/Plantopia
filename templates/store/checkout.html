@@ -102,19 +102,7 @@
                                     {% endfor %}
                                     
                                 </tbody>
-                                
-                              {% comment %} <p class="card-text mb-0">{{ address.first_name }}</p>
-                              <p class="card-text mb-0">{{ address.last_name }}</p>
-                              <p class="card-text mb-0">{{ address.address_line_1 }}</p>
-                              <p class="card-text mb-0">{{ address.address_line_2 }}</p>
-                              <p class="card-text mb-0">{{ address.city }} , {{ address.state }}</p>
-                              <p class="card-text mb-0">{{ address.country }}</p>
-                              <p class="card-text mb-0">{{ address.email }}</p>
-                              <p class="card-text mb-0">{{ address.phone_number }}</p>
-                              {% if address.order_note %}
-                                <b>Order Note : </b> {{ address.order_note }}
-                              {% endif %}  {% endcomment %}
-                              
+                             
                             </div>
                           </div>
                           
@@ -146,22 +134,24 @@
                                                     <h5><a href="shop-product-full.html">{{ cart_item.product.product_name }}</a></h5> 
                                                     <span class="product-qty">x {{ cart_item.quantity }}</span>
                                                 </td>
-                                                <td>${{ cart_item.sub_total }}</td>
+                                                <td>₹{{ cart_item.sub_total }}</td>
                                             </tr>
                                         {% endfor %}
         
                                             <tr>
                                                 <th>SubTotal</th>
-                                                <td class="product-subtotal" colspan="2">${{ total_total }}</td>
+                                                <td class="product-subtotal" colspan="2">₹{{ total_total }}</td>
                                             </tr>
                                             <tr>
                                                 <th>GST</th>
-                                                <td colspan="2"><em>${{ GST }}</em></td>
+                                                <td colspan="2"><em>₹{{ GST }}</em></td>
                                             </tr>
                                             <tr>
                                                 <th>Total</th>
                                                 <td colspan="2" class="product-subtotal" >
-                                                <span  id="total_price" class="font-xl text-brand fw-900">{{ grand_total }}</span>
+                                                <span   class="font-xl text-brand fw-900">₹{{ grand_total }}</span>
+                                                <span  hidden id="total_price" class="font-xl text-brand fw-900">{{ grand_total }}</span>
+                                                
                                             </td>
                                             </tr>
                                     </tbody>
@@ -285,7 +275,7 @@
     
             //razorpay function
             function razorpay(response) {
-                console.log( response.response.order_id)
+               
                console.log(response.response.orders_id)
                 var options = {
                     "key": response.response.key, // Enter the Key ID generated from the Dashboard
@@ -293,14 +283,12 @@
                     "currency": "INR",
                     "name": "Plantopia",
                     "order_id":response.response.payment_id, // Pass the `id` obtained in the response of the server-side order creation
-                    "handler": function(response) {
+                    "handler": function(Response) {
                        
                         window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id;
     
                     },
-                    "theme": {
-                        "color": "#3399cc"
-                    }
+                   
                 };
         
                 var rzp1 = new Razorpay(options);

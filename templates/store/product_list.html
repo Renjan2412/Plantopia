@@ -10,8 +10,6 @@
             <p>Lorem ipsum dolor sit amet.</p>
         </div>
         <div>
-            <a href="#" class="btn btn-light rounded font-md">Export</a>
-            <a href="#" class="btn btn-light rounded  font-md">Import</a>
             <a href="{% url 'add_product' %}" class="btn btn-primary btn-sm rounded">Create new</a>
         </div>
     </div>
@@ -49,7 +47,7 @@
                             <img src="{{ Product.images.url }}" alt="Product"> </a>
                         <div class="info-wrap">
                             <a href="#" class="title text-truncate">{{ Product.product_name }}</a>
-                            <div class="price mb-2">$ {{ Product.price }}</div> <!-- price.// -->
+                            <div class="price mb-2">₹ {{ Product.price }}</div> <!-- price.// -->
                             <a href="{% url 'update_product' Product.id %}" class="btn btn-sm font-sm rounded btn-brand">
                                 <i class="material-icons md-edit"></i> Edit
                             </a>
@@ -60,141 +58,6 @@
                     </div> <!-- card-product  end// -->
                 </div> <!-- col.// -->
                 {% endfor %}
-                 {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/2.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Brown Winter Jacket for Men</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// -->  {% endcomment %}
-                {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/3.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Jeans short new model</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// --> {% endcomment %}
-                {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/4.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Travel Bag XL</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// --> {% endcomment %}
-                {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/5.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Just another product name</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// --> {% endcomment %}
-                {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/6.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Just another product name</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// --> {% endcomment %}
-                {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/7.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Just another product name</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// --> {% endcomment %}
-                {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/8.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Apple Airpods CB-133</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// --> {% endcomment %}
-                {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/9.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Apple Airpods CB-133</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// --> {% endcomment %}
-                {% comment %} <div class="col">
-                    <div class="card card-product-grid">
-                        <a href="#" class="img-wrap"> <img src="assets/imgs/items/10.jpg" alt="Product"> </a>
-                        <div class="info-wrap">
-                            <a href="#" class="title text-truncate">Apple Airpods CB-133</a>
-                            <div class="price mb-2">$179.00</div> <!-- price.// -->
-                            <a href="#" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit
-                            </a>
-                            <a href="#" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                            </a>
-                        </div>
-                    </div> <!-- card-product  end// -->
-                </div> <!-- col.// --> {% endcomment %}
             </div> <!-- row.// -->
         </div> <!-- card-body end// -->
     </div> <!-- card end// -->

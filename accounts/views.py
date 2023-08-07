@@ -16,17 +16,11 @@ from carts.views import _cart_id
 from carts.models import Cart,CartItem
 import requests,logging
 from urllib.parse import urlparse, parse_qs
+from orders.models import Order,OrderProduct
 
 # Create your views here.
 
-# def home(request) :
-    
-#     products = Product.objects.all().filter(is_available=True)
 
-#     context = {
-#         'products' : products,
-#     }
-#     return render(request,'home.html',context)
 def home(request):
     sort_option = request.GET.get('sort_option', 'default')
 
@@ -108,12 +102,12 @@ def user_login(request) :
                     return redirect(nextPage)
             except Exception as e:
                 logging.error(f'Error occurred: {e}')
-                return redirect('dashboard')
+            return redirect('dashboard')
         
         else :
             messages.error(request , 'Invalid Login Credential')
       
-           
+            print('else is workinggg')
             return redirect('user_login')
         
     return render(request,'accounts/user_login.html')
@@ -133,6 +127,7 @@ def login_otp(request) :
             return redirect(login_otp_verify,phone_number)
         else:
             messages.error(request,'Phone number is not registered with us')
+            
      return render(request,'accounts/login_otp.html')
 
 
@@ -163,7 +158,17 @@ def logout(request) :
 
 @login_required(login_url = 'user_login')
 def dashboard(request) :
+    orders = Order.objects.order_by('-updated_at').filter(user_id=request.user.id)
+    userprofile = UserProfile.objects.filter(user=request.user)
+    order_count = orders.count()
+    context = {
+        
+        'order_count':order_count,
+        'user_profile':userprofile,
+    }
     return render(request , 'accounts/dashboard.html')
+
+
 
 def forgotPassword(request) :
     if request.method == 'POST' :
@@ -218,5 +223,30 @@ def edit_profile(request) :
         'user_form' : user_form,
         'profile_form' : profile_form,
     }    
-
     return render(request,'accounts/edit_profile.html',context)
+
+
+
+def my_orders(request) :
+    orders = Order.objects.filter(user=request.user).order_by('-updated_at') 
+    return render(request,'accounts/my_orders.html',{'orders':orders})
+
+def user_order_details(request,id) :
+    
+    order = Order.objects.get(id=id)
+
+    print("jkhfdkjla<HKD")
+    print(order)
+    order_products = OrderProduct.objects.filter(order_id=id)
+    print(order_products)
+    context= {
+        'order' : order , 
+        'order_products' : order_products ,
+    }
+    return render(request,'accounts/user_order_details.html',context)
+
+
+
+
+def invoice(request) :
+    return render(request,'accounts/invoice.html')

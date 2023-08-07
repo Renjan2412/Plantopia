@@ -1,8 +1,12 @@
 from django.shortcuts import render , get_object_or_404,HttpResponse
-from .models import Product
+from .models import Product,Wishlist
 from Catagory.models import Catagory
 from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from carts.models import CartItem
+from django.http import JsonResponse
+
 
 # Create your views here.
 
@@ -55,4 +59,51 @@ def search(request) :
         'product_count' : product_count,
         }     
     return render(request , 'store/store.html', context )
+
+@login_required(login_url='user_login')
+def wishlist(request):
+    wishlist = Wishlist.objects.filter(user=request.user)
+    cart_items = CartItem.objects.filter(user=request.user)
+    # variations = cart_items.values_list('product_variation', flat=True).distinct()
+    # print('variations : ', variations)
+    
+    context = {
+        'wishlist':wishlist,
+        'cart_items':cart_items,
+        # 'variations':variations,
+    }
+    return render(request, 'store/wishlist.html', context)
+
+
+def add_to_wishlist(request):
+    current_user = request.user
+    # flavour = request.POST.get('flavour')
+    # weight  = request.POST.get('weight')
+    product_id = request.POST.get('product_id')
+    print(product_id)
+    
+    
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == "POST":
+        is_wishlist_exists = Wishlist.objects.filter(product=product, user=current_user).exists()
+        if is_wishlist_exists:
+            return JsonResponse({'message':'Item already in the Wishlist...'})
+        else:
+            print('item is not in wishlist')
+            wishlist = Wishlist.objects.create(
+                product=product,
+                user=current_user,
+            )
+            wishlist.save()
+            print(wishlist)
+            return JsonResponse({'message':'Product successfully added to wishlist'})
+    return JsonResponse({'message':'success'})
+
+# Delete wishlist item
+
+def del_wishlist_item(request):
+    wishlist_item_id = request.POST.get('wishlist_item_id')
+    item = Wishlist.objects.get(id=wishlist_item_id)
+    item.delete()
+    return JsonResponse({'message':'item deleted from wishlist...'})
    

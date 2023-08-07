@@ -30,6 +30,13 @@
                                             <div class="form-group">
                                                 <input type="text" required="" name="phone_number" placeholder="Enter your Phone number">
                                             </div>
+                                            {% if messages %}
+                                            <ul class="messages">
+                                                {% for message in messages %}
+                                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
                                             
                                             <div class="login_footer form-group">
                                                 <div class="form-group">
@@ -55,3 +62,23 @@
     
 
 {% endblock content %}
+
+{% block script %}
+
+<script>
+    // Function to remove the error messages after a given duration (in milliseconds)
+    function removeErrorMessages() {
+      const errorMessages = document.querySelectorAll('.messages li');
+      if (errorMessages.length > 0) {
+        setTimeout(() => {
+          errorMessages.forEach(message => message.remove()); // Remove each error message element
+        }, 1000); // Adjust the duration (in milliseconds) as needed
+      }
+    }
+  
+    // Call the function when the page loads
+    window.addEventListener('load', removeErrorMessages);
+  </script>
+  
+
+{% endblock script %}

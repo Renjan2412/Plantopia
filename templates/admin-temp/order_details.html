@@ -1,0 +1,246 @@
+{% extends 'admin-temp/base.html' %}
+{% load static %}
+{% block content %}
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order detail</h2>
+            <p>Details for Order ID: {{order.id}}</p>
+        </div>
+    </div>
+    <div class="card">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                    <span>
+                        <i class="material-icons md-calendar_today"></i> <b>Order Placed at: {{order.created_at}}, Updated Date: {{order.updated_at}}</b>
+                    </span> <br>
+                    <small class="text-muted">Order ID: {{order.id}}</small>
+                </div>
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body" id='order-block'>
+            <div class="row mb-50 mt-20 order-info-wrap">
+                <div class="col-md-4">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-person"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">User Account</h6>
+                            <p class="mb-1">
+                               {{order.user.first_name}} {{order.user.last_name}} <br> {{order.user}} <br> {{order.user.username}} <br> {{order.user.phone_number}}
+                            </p>
+                            <a href="#">View profile</a>
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+                <div class="col-md-4">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-local_shipping"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Order info</h6>
+                            <p class="mb-1">
+                                Shipping: Plantopia International <br> Pay method: {{order.payment.payment_method}} <br> Payment Status: {{order.payment.status}}
+                            </p>
+                            
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+                <div class="col-md-4">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-place"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Deliver to</h6>
+                            <p class="mb-1">
+                                {{order.address.full_name}} <br>{{order.address.full_address}}<br>
+                                {{order.address.city}}, {{order.address.state}}<br>
+                                {{order.address.country}} - {{order.address.postcode}}
+                            </p>
+                            
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+            </div> <!-- row // -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="10%" class='text-center'>Image</th>
+                                    <th width="25%" class='text-center'>Product</th>
+                                    <th width="10%" class='text-center'>Unit Price</th>
+                                    <th width="10%" class='text-center'>Quantity</th>
+                                    <th width="10%" class="text-center">Total</th>
+                                    {% comment %} <th width="10%" class="text-center">status</th> {% endcomment %}
+                                    <th width="15%" class="text-center"></th>
+                                    {% comment %} <th width="10%" class="text-center"></th> {% endcomment %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order_item in order_items %}
+                                <tr>
+                                    <td class='text-center'>
+                                        <img src="{{order_item.product.images.url}}" width="40" height="40" class="img-xs" alt="Item">
+                                    </td>
+                                    <td class='text-center align-middle'>
+                                        <a class="" href="#">{{order_item.product.product_name}}</a>
+                                    </td>
+                                    <td class='text-center align-middle'> ₹{{order_item.product_price}} </td>
+                                    <td class='text-center align-middle'> {{order_item.quantity}} </td>
+                                    <td class="text-center align-middle"> ₹{{order_item.total}} </td>
+                                    {% comment %} <td class="text-center align-middle">
+                                        <span class="badge rounded-pill {% if order_item.status == 'Delivered' %}alert-success text-success {% elif  order_item.status == 'Cancelled' %}alert-danger text-danger {% else %} alert-warning text-warning{% endif %} ">
+                                            {{order_item.status}}
+                                        </span> 
+                                    </td> {% endcomment %}
+                                    {% comment %} {% if order_item.status == 'Delivered'%}
+                                    <td class="text-center align-middle"><span class='badge rounded-pill alert-info text-info'>Amount Paid</span></td>
+                                    {% elif order_item.status == 'Returned'%}
+                                    <td class="text-center align-middle"><span class="badge rounded-pill alert-dark text-white">Amount Refunded to wallet</span></td>
+                                    {% elif order_item.status == 'Cancelled' %}
+                                        {% if order_item.order.payment.status == 'COMPLETED' %}
+                                        <td class="text-center align-middle"><span class="badge rounded-pill alert-dark text-white">Amount Refunded to wallet</span></td>
+                                        {% endif %}
+                                    {% else %} {% endcomment %}
+                                    {% comment %} <td class="text-center align-middle">
+                                        
+                                            <form>
+                                                {% csrf_token %}
+                                                <select class="form-select d-inline-block mw-200" onchange="statusChange('{{order_item.id}}',this.value)">
+                                                    <option value="{{order_item.status}}" selected>{{order_item.status}}</option>
+                                                    {% if order_item.status == 'Order Placed' %}
+                                                    <option>Shipped</option>
+                                                    <option>Cancel</option>
+                                                    {% elif order_item.status == 'Shipped' %}
+                                                    <option>Out For Delivery</option>
+                                                    <option>Delivered</option>
+                                                    {% elif order_item.status == 'Out For Delivery'%}
+                                                    <option>Delivered</option>
+                                                    {% elif order_item.status == 'Return Requested'%}
+                                                    <option>Approve Return</option>
+                                                    {% endif %}
+                                                </select>
+                                                
+                           
+                                            </form>
+                                        
+                                    </td> {% endcomment %}
+                                    {% comment %} {% endif %} {% endcomment %}
+                                    {% comment %} <td class="text-center align-middle">
+                                        <a class='btn btn-primary'> Apply</a>
+                                    </td> {% endcomment %}
+                                </tr>
+                                
+                                {% endfor %}
+
+                                <tr>
+                                    <td colspan="6">
+                                        <article class="float-end">
+                                            {% if order.order_total > 0 %}
+                                            <dl class="dlist">
+                    
+                                                <dt>Subtotal:</dt>
+                                                <dd>₹{{order.sub_total}}</dd>
+                                            </dl>
+                                            <dl class="dlist">
+                                                <dt>Shipping cost:</dt>
+                                                <dd>Free</dd>
+                                            </dl>
+                                            {% if order.discount_amount != 0 %}
+                                            <dl class="dlist">
+                                                <dt>Coupon Discount:</dt>
+                                                <dd>-₹{{order.discount_amount}}</dd>
+                                            </dl>
+                                            {% endif %}
+                                            <dl class="dlist">
+                                                <dt>Grand total:</dt>
+                                                <dd> <b class="h5">₹{{order.order_total}}</b> </dd>
+                                            </dl>
+                                            <dl class="dlist">
+                                                <dt class="text-muted">Payment Status:</dt>
+                                                <dd>
+                                                    <span class="badge rounded-pill alert-success text-success">{{order.payment.status}}</span>
+                                                </dd>
+                                            </dl>
+                                            
+                                            {% endif %}
+                                            
+                                        </article>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> <!-- table-responsive// -->
+                </div> <!-- col// -->
+                <div class="col-lg-1"></div>
+                {% comment %} <div class="col-lg-4">
+                    <div class="box shadow-sm bg-light">
+                        <h6 class="mb-15">Payment info</h6>
+                        <p>
+                            <img src="assets/imgs/card-brands/2.png" class="border" height="20"> Master Card **** **** 4768 <br>
+                            Business name: Grand Market LLC <br>
+                            Phone: +1 (800) 555-154-52
+                        </p>
+                    </div>
+                    <div class="h-25 pt-4">
+                        <div class="mb-3">
+                            <label>Notes</label>
+                            <textarea class="form-control" name="notes" id="notes" placeholder="Type some note"></textarea>
+                        </div>
+                        <button class="btn btn-primary">Save note</button>
+                    </div>
+                </div> <!-- col// --> {% endcomment %}
+            </div>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+</section> <!-- content-main end// -->
+
+{% endblock content %}  
+
+
+
+{% block script %}
+<script>
+    function statusChange(orderItemId, status) {
+        console.log('order item id : ', orderItemId)
+        console.log('status : ', status)
+        swal({
+            title:"Are You Sure!",
+            text:"Do you Want to change the status of the order",
+            icon:"warning",
+            buttons:['Cancel','Yes'],
+        }).then(function(confirmYes) {
+            if(confirmYes){
+                $.ajax({
+                    url:"/Admin/change_status/",
+                    data:{
+                        'orderproduct_id':orderItemId,
+                        'status':status,
+                    },
+                    success:function(response){
+                        swal({
+                            title:"Updated",
+                            text:response.message,
+                            icon:"success",
+                            timer:4000,
+                            button:false,
+                        }).then(function(){
+                            $('#order-block').load(location.href + ' #order-block')
+                        })
+                    }
+                })
+            }
+        })
+
+    }
+</script>
+
+{% endblock script %}
+

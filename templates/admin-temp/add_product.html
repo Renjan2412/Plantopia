@@ -43,7 +43,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="price" class="form-label">Price</label>
-                        {{form.price}}
+                        ₹ {{form.price}}
                         {% if form.errors.price %}
                         <label  class="text-danger">{{ form.errors.price }}</label>
                         {% endif %}

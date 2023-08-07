@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'store',
     'carts',
     'orders',
+    'offer',
     
 ]
 
@@ -58,6 +59,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'plantopia.urls'
+
 
 TEMPLATES = [
     {

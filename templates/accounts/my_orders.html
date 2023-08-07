@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Account
+                <span></span> My orders
+            </div>
+        </div>
+    </div>
+    
+    <section class="pt-150 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        {% include 'includes/user_dashboard_sidebar.html' %}
+                        <div class="col-md-8">
+                            {% if orders %}
+                            
+                                
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Your Order</h5>
+                                        </div>
+                                        <div class="card-body" id='card-bodyy'>
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Order #</th>
+                                                            <th>Biiling Name</th>
+                                                            <th>Billing Address</th>
+                                                            {% comment %} <th>Total Amount</th> {% endcomment %}
+                                                            
+                                                            
+                                                            {% comment %} <th>Invoice</th> {% endcomment %}
+                                                            <th>Order details</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for i in orders %}
+                                                        <tr>
+                                                            <td>{{i.id}}</td>
+                                                            <td>{{i.address.full_name}}</td>
+                                                            <td>{{i.address.full_address}}</td>
+                                                            {% comment %} <td>{{i.order_total}}</td> {% endcomment %}
+                                                            
+                                                            
+                                                            {% comment %} <td><a id="view-btnn" class="view-oder btn-small d-block" data-order-id="{{i.order_number}}">View</a></td> {% endcomment %}
+                                                            <td>
+                                                                {% comment %} <div class="dropdown text-center">
+                                                                    <a href="#" data-bs-toggle="dropdown" class='' style='width:30px;height:30px'> <i class="fi fi-rs-menu-dots-vertical"></i> </a>
+                                                                    <div class="dropdown-menu">
+                                                                        <a class="dropdown-item" href="{% url 'order_cancel' i.id %}">Order Cancel</a>
+                                                                        <a class="dropdown-item" href="#">Order return</a>
+                                                                        <a class="dropdown-item text-danger" href="#">Delete</a>
+                                                                    </div>
+                                                                </div> {% endcomment %}
+                                                                <a href="{% url 'user_order_details' i.id %}">View Details</a>
+                                                                
+                                                            </td>
+                                                            
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                
+                            {% else %}
+                            <div class='text-center'>
+                                <h3> Order detail is empty </h3>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock content %}
+
+
+

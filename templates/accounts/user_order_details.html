@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Account
+                <span></span> My profile
+            </div>
+        </div>
+    </div>
+    <section class="pt-150 pb-150">
+        <div class="container" id='user-order-det-block'>
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="row pb-60 pt-30">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Order Number : #{{order.id}}</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            
+                                            <p class="mb-2">Order Date: {{order.created_at}} </p>
+                                            {% if order.order_total > 0 %}
+                                            
+                                                <p class="mb-2">Payment method : {{order.payment.payment_method}} </p>
+                                                <p class="mb-2">Payment Status : {{order.payment.status}}</p>
+                                                {% if order.coupon %}
+                                                    <p class="mb-2">Coupon: {{order.coupon.code}} </p>
+                                                {% endif %}
+                                                <p class="mb-2">Total: {{order.order_total}}</p>
+                                            {% else %}
+                                                <span class=" rounded-pill alert-danger text-danger">Order Cancelled</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+    
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Billing Address</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class='mb-2'>{{order.address.full_name}}</p>
+                                            <p class='mb-2'>{{order.address.full_address}}</p>
+                                            <p class='mb-2'>{{order.address.city}}, {{order.address.state}}</p>
+                                            <p class='mb-2'>{{order.address.country}} - {{order.address.post_code}}</p>
+                                            
+                                        </div>
+                                    </div>
+    
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Product Details</h5>
+                                </div>
+                                <div class="card-body ">
+                                    <div class="table-responsive">
+                                        {% csrf_token %}
+                                        <table class="table table-hover">
+                                            <thead class="text-center">
+                                                <tr>
+                                                    <th scope="col">Image</th>
+                                                    <th scope="col">Product Name</th>
+                                                    <th scope="col">Quantity</th>
+                                                    <th scope="col">Unit Price</th>
+                                                    <th scope="col">Total</th>
+                                                    <th scope="col">Status</th>
+                                                    <th scope="col">Actions</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody class="text-center">
+                                                {% for product in order_products %}
+                                                <tr>
+                                                    <td scope="row" class="image product-thumbnail"><img src="{{product.product.images.url}}" alt=""></th>
+                                                    <td>{{product.product.product_name}}
+                                                       
+                                                    </td>
+                                                    <td>{{product.quantity}}</td>
+                                                    <td>₹ {{product.product_price}}</td>
+                                                    <td>₹ {{product.total}}</td>
+                                                    <td>{{product.status}}</td>
+                                                    <td>
+                                                        {% if order.status == 'Delivered' %}	
+																		<a href="" class="returnorder" ><button class="btn btn-outline-warning return">RETURN</button></a>
+															{% else %}
+																	<a href="{% url 'cancel_order' order.id %}" class="returnorder"><button class="btn btn-outline-warning return">CANCEL</button></a>
+														{% endif %}
+                                                    </td>
+                                                    {% comment %} {% if product.status == 'Delivered' %}
+                                                        <td><a class='btn btn-secondary' id='user-ord-retrn' data-orderproduct-id="{{product.id}}">Return Product</a></td>
+                                                    {% elif product.status == 'Returned' %}
+                                                    <td><span class="badge rounded-pill alert-warning text-warning">Order Returned</span>&nbsp;&nbsp;&nbsp; <span class="badge rounded-pill alert-dark text-white">Amount Refunded to wallet</span></td>
+                                                    {% elif product.status == 'Shipped' or product.status == 'Out For Delivery' %}
+                                                        <td></td>
+                                                    {% elif product.status == 'Return Requested'%}
+                                                    <td><span class="badge rounded-pill alert-warning text-warning">{{product.status}}</span></td>
+                                                    {% elif product.status != 'Cancelled' %}
+                                                        <td>
+                                                            <a class='btn' id='user-act' data-orderproduct-id="{{product.id}}">Cancel Product </a> 
+                                                            <a class='btn' id='user-act' data-orderproduct-id="{{product.id}}">Cancel Product</a>
+                                                        </td>
+                                                        
+                                                    {% else %}
+                                                        <td>
+                                                            <span class="badge rounded-pill alert-danger text-danger">Order Canceled</span> 
+                                                            <span class="badge rounded-pill alert-danger text-danger">Product Cancelled</span>
+                                                            
+                                                        </td>
+                                                    {% endif %} {% endcomment %}
+                                                    
+                                                    
+                                                    {% if product.status == 'Delivered' %}
+                                                    <td><a href="{% url 'invoice' %}" class='btn btn-sm btn-info'>Invoice</a></td>
+                                                    {% endif %}
+                                                </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <tr>
+                                                        <td colspan="7">
+                                                            <article class="float-end w-50 h-100">
+                                                                {% if order.order_total > 0 %}
+                                                                <dl class="d-flex justify-content-between">
+                                                                    <dt>Subtotal:</dt>
+                                                                    <dd>₹{{order.order_total_amount}}</dd>
+                                                                </dl>
+                                                                <dl class="d-flex justify-content-between">
+                                                                    <dt>Shipping cost:</dt>
+                                                                    <dd>Free</dd>
+                                                                </dl>
+                                                                {% if order.discount_amount != 0 %}
+                                                                <dl class="d-flex justify-content-between">
+                                                                    <dt>Coupon Discount:</dt>
+                                                                    <dd>-₹{{order.discount_amount}}</dd>
+                                                                </dl>
+                                                                {% endif %}
+                                                                <dl class="d-flex justify-content-between">
+                                                                    <dt>Grand total:</dt>
+                                                                    <dd> <b class="h5">₹{{order.order_total}}</b> </dd>
+                                                                </dl>
+                                                                <dl class="d-flex justify-content-between">
+                                                                    <dt class="text-muted">Payment Status:</dt>
+                                                                    <dd>
+                                                                        <span class="badge rounded-pill alert-success text-success">{{order.payment.status}}</span>
+                                                                    </dd>
+                                                                </dl>
+                                                        
+                                                                {% endif %}
+                                                                
+                                                            </article>
+                                                        </td>
+                                                    </tr>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock content %}

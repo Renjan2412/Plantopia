@@ -1,0 +1,16 @@
+{% load static %}
+ 
+{% block content %}
+<div class="col-md-4">
+    <div class="dashboard-men">
+        <div class="list-grou">
+            <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action {% if '/dashboard/' == request.path %}active{% endif %}"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+            <a href="{% url 'my_orders' %}" class="list-group-item list-group-item-action {% if '/my_orders/' == request.path %}active{% endif %}"><i class="fi-rs-shopping-bag mr-10"></i>My Orders</a>
+            <a href="{% url 'edit_profile' %}" class="list-group-item list-group-item-action {% if '/edit-profile/' == request.path %}active{% endif %}"><i class="fi-rs-user mr-10"></i>My Profile</a>
+            <a href="" class="list-group-item list-group-item-action {% if '/my-address/' == request.path %}active{% endif %}"><i class="fi-rs-marker mr-10"></i>My Address Book</a>
+            <a href="" class="list-group-item list-group-item-action {% if '/change-password/' == request.path %}active{% endif %}"><i class="fi fi-rs-lock mr-10"></i>Change Password</a>
+            <a href="{% url 'logout' %}" class="list-group-item list-group-item-action"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

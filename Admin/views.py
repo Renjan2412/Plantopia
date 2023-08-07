@@ -7,11 +7,72 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
 from django.forms import inlineformset_factory
 from django.http import JsonResponse
+from orders.models import OrderProduct
+import calendar
+from orders.models import Order
+from django.db.models import Count
+from django.db.models.functions import ExtractMonth,ExtractYear
+
 
 # Create your views here.
 
 def my_admin_view(request) :
-    return render(request , 'admin-temp/index.html')
+    delivered_orders = Order.objects.filter(status='Delivered')
+    print(delivered_orders)
+    delivered_orders_by_months = delivered_orders.annotate(delivered_month=ExtractMonth('created_at')).values('delivered_month').annotate(delivered_count=Count('id')).values('delivered_month', 'delivered_count')
+    print( "delivered_orders_by_months")
+    print( delivered_orders_by_months)
+    delivered_orders_month = []
+    delivered_orders_number = []
+    for d in delivered_orders_by_months:
+         delivered_orders_month.append(calendar.month_name[d['delivered_month']])
+         delivered_orders_number.append(list(d.values())[1])
+
+    order_by_months = Order.objects.annotate(month=ExtractMonth('created_at')).values('month').annotate(count=Count('id')).values('month', 'count')
+    monthNumber = []
+    totalOrders = []
+
+    for o in order_by_months:
+        monthNumber.append(calendar.month_name[o['month']])
+        totalOrders.append(list(o.values())[1])
+        
+    order_by_year = Order.objects.annotate(year=ExtractYear('created_at')).values('year').annotate(count=Count('id')).values('year', 'count')
+
+    yearNumber = []
+    total_Orders = []
+
+    for o in order_by_year:
+        yearNumber.append(o['year'])
+        total_Orders.append(o['count'])    
+
+    print(yearNumber)
+    print(1)
+    
+    print(delivered_orders)
+    
+    print(total_Orders)
+    print(order_by_months)
+    print(2)
+    
+    print(delivered_orders_number)
+    print(delivered_orders_month)
+    print(delivered_orders_by_months)
+    context = {
+        'monthNumber': monthNumber,
+        'totalOrders': totalOrders,
+        'yearNumber': yearNumber,
+        'total_Orders': total_Orders,
+        'delivered_orders':delivered_orders,
+        'order_by_months':order_by_months,
+        
+        'totalOrders':totalOrders,
+        'delivered_orders_number':delivered_orders_number,
+        'delivered_orders_month':delivered_orders_month,
+        'delivered_orders_by_months':delivered_orders_by_months,
+
+    }
+    return render(request, "admin-temp/index.html",context)
+
 
 # User side
 
@@ -135,3 +196,52 @@ def block_user(request,id):
             user.is_blocked = True
             user.save()
             return JsonResponse({'title':'Blocked','text':'User is Blocked'})
+        
+def change_status(request, orderproduct_id, new_status):
+    order_product = get_object_or_404(OrderProduct, id=orderproduct_id)
+    order_product.status = new_status
+    order_product.save()
+    
+    return JsonResponse({'message': 'Status changed successfully'})  
+
+def sales_report(request) :
+    if request.user.is_superadmin:
+        orders = Order.objects.all().order_by("-created_at")
+        print('orders : ', orders)
+        msg = 'nothing'
+        if request.method == 'POST':
+            start_date = request.POST.get('startDate')
+            end_date = request.POST.get('endDate')
+            if start_date == end_date:
+                orders = Order.objects.all().filter(created_at__date=start_date)
+                msg = 'Showing the results of the date : '+ start_date
+            
+            else:
+                orders = Order.objects.all().filter(created_at__range=[start_date,end_date])
+                msg = 'Showing the results between '+ start_date + '--' + end_date
+
+
+        context = {
+            'orders':orders,
+            'msg':msg,
+        }
+
+        return render(request,'admin-temp/sales_report.html',context)
+
+def monthly_sales(request):
+    if request.user.is_superadmin:
+        print('request.post : ', request.POST)
+        month = request.POST.get('month')
+        orders = Order.objects.all().filter(created_at__month=month)
+        print('orders month : ', orders)
+        if orders.count() == 0:
+            msg = 'No result found for this month'
+        else:
+            msg = 'The details of the sales in this month are : '
+        context = {
+            'msg':msg,
+            'orders':orders,
+        }
+        return render(request, 'admin-temp/sales_report.html', context)
+
+      

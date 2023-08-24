@@ -18,6 +18,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/theme/plantopia.png' %}">
     <!-- Template CSS -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+    <!--sweet alert-->
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.min.css'></link>
    
     
 </head>
@@ -57,9 +59,9 @@
 <script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
 <!-- Template  JS -->
 <script src="{% static 'assets/js/main.js' %}"></script>
-<script src="{% static 'assets/js/shop.js' %}"></script> 
-
-
+<script src="{% static 'assets/js/shop.js' %}"></script>
+{% comment %} <script src="{% static 'assets/js/search.js' %}"></script>  {% endcomment %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 {% comment %} <script src="https://www.paypal.com/sdk/js?client-id=ARPQFdr5MpapZAnXkQGoK8M3SGdQUGhraMqQHtHv2d3nw-YIsxg2bojD352U2CftPb34Ekif6CNjrW4x&currency=USD" data-namespace="paypal_sdk_1"></script>  {% endcomment %}
 {% block script %}
 

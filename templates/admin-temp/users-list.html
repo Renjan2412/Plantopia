@@ -1,72 +1,28 @@
 {% extends 'admin-temp/base.html' %}
 {% block content %}
 
-<div class="card mb-4">
-    {% comment %} <header class="card-header">
-        <h4 class="card-title">Latest orders</h4>
-        <div class="row align-items-center">
-            <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                <div class="custom_select">
-                    <select class="form-select select-nice">
-                        <option selected>All Categories</option>
-                        <option>Women's Clothing</option>
-                        <option>Men's Clothing</option>
-                        <option>Cellphones</option>
-                        <option>Computer & Office</option>
-                        <option>Consumer Electronics</option>
-                        <option>Jewelry & Accessories</option>
-                        <option>Home & Garden</option>
-                        <option>Luggage & Bags</option>
-                        <option>Shoes</option>
-                        <option>Mother & Kids</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-2 col-6">
-                <input type="date" value="02.05.2021" class="form-control">
-            </div>
-            <div class="col-md-2 col-6">
-                <div class="custom_select">
-                    <select class="form-select select-nice">
-                        <option selected>Status</option>
-                        <option>All</option>
-                        <option>Paid</option>
-                        <option>Chargeback</option>
-                        <option>Refund</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </header> {% endcomment %}
+
+    
 <div class="card-body"> 
     <div class="table-responsive">
         <div class="table-responsive" id="block-container">
-            <table class="table align-middle table-nowrap mb-0">
+            <table class="table align-middle table-nowrap mb-0" id="userTable">
                 <thead class="table-light">
                     <tr>
-                        {% comment %} <th scope="col" class="text-center">
-                            <div class="form-check align-middle">
-                                <input class="form-check-input" type="checkbox" id="transactionCheck01">
-                                <label class="form-check-label" for="transactionCheck01"></label>
-                            </div>
-                        </th> {% endcomment %}
+                        
                         <th class="align-middle" scope="col">Name</th>
                         <th class="align-middle" scope="col">Email</th>
                         <th class="align-middle" scope="col">Phone Number</th>
                         <th class="align-middle" scope="col">IS Ative</th>
-                        <th class="align-middle" scope="col"></th>
-                        {% comment %} <th class="align-middle" scope="col">Block</th> {% endcomment %}
+                        
+                        
+
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users %}
                     <tr>
-                        {% comment %} <td class="text-center">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="transactionCheck02">
-                                <label class="form-check-label" for="transactionCheck02"></label>
-                            </div>
-                        </td> {% endcomment %}
+                
                          <td>{{ user.first_name }}</td> 
                         <td>{{ user.email }}</td>
                         <td>
@@ -116,6 +72,17 @@
 
 
 {% block script %}
+<script>
+    $('#userTable').DataTable({
+        paging:true,
+        pageLength:5,
+        lengthChange:true,
+        autoWidth:true,
+        searching:true,
+        bInfo:true,
+        bSort:false,
+    })
+</script>
 <script>
     $(document).on('click', '#user-blk', function(e) {
         e.preventDefault()

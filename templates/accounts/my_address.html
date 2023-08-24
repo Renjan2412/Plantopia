@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<main class="main" id="address-block">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{% url 'home' %}" rel="nofollow">Home</a>
+                <span></span> Account
+                <span></span> My Address
+            </div>
+        </div>
+    </div>
+    {% if addresses %}
+    <div class='container pt-60'>
+        <div class="row">
+
+            <div class='col-lg-11 text-end'>
+                <div class="row">
+                    <div>
+
+                        <a class="btn btn-primary btn-sm rounded" id="newAdd"><i class="fi fi-rs-plus"
+                                style="vertical-align: middle; font-size:16px;"></i> New Address</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Form Modal -->
+    <div class="modal fade" id="newAddressModal" tabindex="-1" role="dialog" aria-labelledby="newAddressModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newAddressModalLabel">New Address</h5>
+                    <button type="button" class="close" aria-label="Close" onclick="closeModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <form id="address-form">
+                        {% csrf_token %}
+                        <input type='hidden' name='addr_id' id='addr_id_input' value=''>
+                        <!-- Form fields -->
+                        {{form.as_p}}
+                        <!-- Add more form fields here as needed -->
+
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <section class="pt-70 pb-150">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        {% include 'includes/user_dashboard_sidebar.html' %}
+                        <div class="col-md-8">
+                            {% if addresses %}
+                            <div class="row" id='user-adrss'>
+                                {% for address in addresses %}
+                                <div class="col-lg-6 pt-5" data-address-id="{{address.id}}">
+                                    <div class="card mb-3 mb-lg-0 {% if address.default_addr %}highlight-card{% endif %}">
+                                        <div class="card-header d-flex justify-content-between">
+                                            <h5 class="mb-0">Address</h5>
+                                            {% if address.default_addr %}
+                                            <span class="default-indicator"><i class="fi fi-rs-check"></i> Selected</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="card-body">
+                                            <address>{{address.first_name}} {{address.last_name}}<br>{{address.address_line_1}},<br>{{address.address_line_2}}.<br> {{address.city}}.
+                                                <br>{{address.state}}, {{address.country}}
+                                            </address>
+                                            <p>Pincode : {{address.post_code}}</p>
+                                            <div class='d-flex justify-content-end'>
+                                            
+                                                <a href="#" class="btn-small" id="del-buton">Delete</a>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                            </div>
+                            {% else %}
+                            <div class='container'>
+                                <div class="row">
+                        
+                                    <div class='col-lg-11 text-center'>
+                                        <div class="row">
+                                            <div>
+                                                <h3> Address Book is Empty</h3>
+                                            </div>
+
+
+                                            <div class="pt-20">
+                        
+                                                <a href="{% url 'add_address' %}" class="btn btn-primary btn-sm rounded"  href="{% url 'add_address' %}"><i class="fi fi-rs-plus"
+                                                        style="vertical-align: middle; font-size:16px;"></i> New Address</a>
+                                            </div>
+                                            <div class='pt-20'>
+                                                {% include 'includes/alerts.html' %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock content %}
+{% block script %}
+<script>
+    $(document).on('click', '#del-buton', function(e){
+        e.preventDefault()
+        var addressId = $(this).closest('.col-lg-6').data('address-id');
+    
+        swal({
+            title:"Are You Sure",
+            text:"Do you want delete this address??",
+            icon:"warning",
+            buttons: ["Cancel", "Delete"],
+            dangerMode: true,
+        }).then(function(confirmDelete){
+            if (confirmDelete) {
+            
+                $.ajax({
+                    method:"GET",
+                    url:'/accounts/delete-address/' + addressId,
+                    success:function(response){
+                        swal({
+                            title:"Deleted",
+                            text:"Address Deleted!",
+                            icon:"success",
+                            timer:4000,
+                            button:false,
+                        }).then(function(){
+                            $('#address-block').load(location.href + ' #address-block');
+                        });
+                    }
+                })
+            }
+        });
+    });
+</script>
+{% endblock script %}

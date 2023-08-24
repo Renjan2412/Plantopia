@@ -1,112 +1,220 @@
-
-
 {% extends 'admin-temp/base.html' %}
 {% load static %}
+
 {% block content %}
-        <section class="content-main">
-            <div class="content-header ">
-                <div class='col-md-6'>
-                    <h2 class="content-title card-title">Dashboard </h2>
-                    <p>Whole data about your business here</p>
-                </div>
-                <div class='col-md-6 text-end'>
-                    <a href="{% url 'sales_report' %}" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
-                </div>
-              <div>
-                   
-                </div>  
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Dashboard </h2>
+            
+        </div>
+        <div>
+            <a href="{% url 'sales_report' %}" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Sales Report</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-primary-light"><i
+                            class="text-primary material-icons md-monetization_on"></i></span>
+                    <div class="text text-center">
+                        <h6 class="mb-1 card-title">Revenue</h6>
+                        <span>₹ {{revenue}}</span>
+                        
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-success-light"><i
+                            class="text-success material-icons md-local_shipping"></i></span>
+                    <div class="text text-center">
+                        <h6 class="mb-1 card-title">Orders</h6> <span>{{total_orders}}</span>
+                        <span class="text-sm">
+                            {% for i in status_counts %}
+                                {{i.status}} Order : {{i.count}} <br>
+                            {% endfor %}
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-warning-light"><i
+                            class="text-warning material-icons md-qr_code"></i></span>
+                    <div class="text text-center">
+                        <h6 class="mb-1 card-title">Products</h6> <span>{{product_count}}</span>
+                        <span class="text-sm">
+                            In {{category_count}} Categories
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-info-light"><i
+                            class="text-info material-icons md-person"></i></span>
+                    <div class="text text-center">
+                        <h6 class="mb-1 card-title">Total Users</h6> <span>{{user_count }}</span>
+                        
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-8 col-lg-12">
+            <div class="card mb-4">
+                <article class="card-body">
+                    <h5 class="card-title">Sale statistics - Revenue</h5>
+                    <canvas id="myChart" height="120px"></canvas>
+                </article>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-12">
+            <div class="card mb-4">
+                <article class="card-body">
+                    <h5 class="card-title">Sales count per month</h5>
+                    <canvas id="myChart3" height="217"></canvas>
+                </article>
             </div>
             
-            <div class="row">
-                <div class="col-xl-8 col-lg-12">
-                    <div class="card mb-4">
-                        <article class="card-body">
-                            <h5 class="card-title">Sale statistics</h5
-                        <canvas id="myChart" height="120px"></canvas> 
-                            <canvas id="myChart1"></canvas>
-                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                
-                          <script>
-                            
-                            const ctx1 = document.getElementById('myChart1');
-                          
-                            new Chart(ctx1, {
-                              type: 'bar',
-                              data: {
-                                labels: {{ monthNumber|safe }},
-                                datasets: [{
-                                  label: 'Total orders by this month',
-                                  data: {{ totalOrders|safe }},
-                                  borderWidth: 1
-                                }]
-                              },
-                              options: {
-                                scales: {
-                                  y: {
-                                    beginAtZero: true
-                                  }
-                                }
-                              }
-                            });
-                          </script>
-
-                            
-                        </article>
-                    </div>
-                 </div>
-              </div>
-           </section> 
-
-
-
-
-      <section class="content-main">
-       
-           <div class="row">
-            <div class="col-xl-8 col-lg-12">
-                <div class="card mb-4">
-                    <article class="card-body">
-                        <h5 class="card-title">Sale statistics</h5>
-                        
-                    <canvas id="myChart3" height="120px"></canvas> 
-                        <canvas id="myChart3"></canvas>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-xl-8 col-lg-12">
+            <div class="card mb-4">
+                <article class="card-body">
+                    <h5 class="card-title">Count of Orders</h5>
+                    <canvas id="myChart2" height="217"></canvas>
+                </article>
+            </div>
             
-                     
+        </div> 
+    </div>
+    
+</section> <!-- content-main end// -->
+
+{% endblock content %}
+
+
+{% block script %}
+<script>
+    if ($('#myChart').length) {
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'line',
+            
+            // The data for our dataset
+            data: {
+                labels: [{% for date in date_list %} '{{date}}', {% endfor %}],
+                datasets: [{
+                        label: 'Weekly Sales',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(44, 120, 220, 0.2)',
+                        borderColor: 'rgba(44, 120, 220)',
+                        data: [{% for amount in amount_per_day %} '{{amount}}', {% endfor %}]
+                    },
+                    
+
+                ]
+            },
+            options: {
+                plugins: {
+                legend: {
+                    labels: {
+                    usePointStyle: true,
+                    },
+                }
+                }
+            }
+        });
+    }
+
+
+    if ($('#myChart2').length) {
+        var ctx = document.getElementById("myChart2");
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+            labels: [{% for date in neworders %} '{{date.order__updated_at__date}}', {% endfor %}],
+            datasets: [
+                {
+                    label: "New orders",
+                    backgroundColor: "#5897fb",
+                    barThickness:10,
+                    data: [{% for order in neworders %} '{{order.orderitemscount}}', {% endfor %}]
+                }, 
+                {
+                    label: "Cancelled",
+                    backgroundColor: "#7bcf86",
+                    barThickness:10,
+                    data: [{% for order in cancelledorders %} '{{order.cancelleditemscount}}', {% endfor %}]
+                },
+                {
+                    label: "Returned",
+                    backgroundColor: "#ff9076",
+                    barThickness:10,
+                    data: [{% for order in returnorders %} '{{order.returnedorderscount}}', {% endfor %}]
+                },
+                {
+                    label: "Delivered",
+                    backgroundColor: "#d595e5",
+                    barThickness:10,
+                    data: [{% for order in deliveredorders %} '{{order.delivereditemscount}}', {% endfor %}]
+                },
+            ]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                        usePointStyle: true,
+                        },
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } //end if
+
+    if ($('#myChart3').length) {
+        var ctx = document.getElementById("myChart3");
+        var myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [
+                {
+                    label: "Total sales",
+                    backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850","#ff6699","#cc6600","#993366","#999966","#66ff33","#00ff99"],
+                    data: {{monthly_order_count}},
+                }, 
                 
-                  <script>
-                        
-                        const ctx2 = document.getElementById('myChart3');
-                      
-                        new Chart(ctx2, {
-                          type: 'line',
-                          data: {
-                            labels: {{ monthNumber|safe }},
-                            datasets: [{
-                              label: 'Delivered orders by this month',
-                              data: {{  delivered_orders_number|safe }},
-                              borderWidth: 1
-                            }]
-                          },
-                          options: {
-                            scales: {
-                              y: {
-                                beginAtZero: true
-                              }
-                            }
-                          }
-                        });
-                      </script>
+            ]
+            },
+            options: {
+                title: {
+                    display:true,
+                    text:''
+                }
+            }
+            
+        });
+    } //end if
 
-                        
-                    </article>
-                </div>
-             </div>
-          </div>
-       
-      </section> 
-   {% endblock content %}
-
-
-
-
+</script>
+{% endblock script %}

@@ -1,0 +1,85 @@
+{% extends 'admin-temp/base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Add New Coupon</h2>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Coupon Details</h4>
+                </div>
+                <div class="card-body">
+                    <form method='post' enctype="multipart/form-data" id='couponForm'>
+                        {% csrf_token %}
+                        {{form.as_p}}
+                        <button type="submit" class="btn btn-primary mt-5">Submit</button>
+                    </form>
+                </div>
+            </div> <!-- card end// -->
+            
+        </div>
+       
+    </div>
+</section> <!-- content-main end// -->
+
+
+
+
+{% endblock content %}
+
+
+{% block script %}
+<script>
+    $(document).on('submit','#couponForm', function(e) {
+        e.preventDefault()
+        var couponCode = document.getElementById('id_code').value.trim()
+        if (couponCode.length == 0 || couponCode.length <3) {
+            swal({
+                title:'Warning',
+                text:'Please enter min 3 charactes for the code',
+                icon:'warning'
+            })
+            return
+        }
+
+        var startDate = document.getElementById('id_valid_from').value
+        var endDate = document.getElementById('id_valid_to').value
+        if (startDate > endDate) {
+            swal({
+                title:'Warning',
+                text:'Coupon start date should be less days than end date',
+                icon:'warning'
+            })
+            return
+        }
+        var min_amount = document.getElementById('id_min_amount').value
+        if (min_amount < 0) {
+            swal({
+                title:'Warning',
+                text:'Minimum amount should be greater than or equal to zero',
+                icon:'warning'
+            })
+            return
+        }
+
+        var dis_amount = document.getElementById('id_discount_amount').value
+        if (dis_amount < 10) {
+            swal({
+                title:'Warning',
+                text:'discount amount should be greater than Rs.10',
+                icon:'warning'
+            })
+            return
+        }
+        this.submit()
+    })
+</script>
+
+
+{% endblock script %}
+        

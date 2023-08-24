@@ -8,6 +8,7 @@ from carts.models import CartItem
 from django.http import JsonResponse
 
 
+
 # Create your views here.
 
 def store(request , catagory_slug = None) :
@@ -47,18 +48,40 @@ def product_detail(request , catagory_slug , product_slug) :
     }    
     return render(request , 'store/product-detail.html',context)
 
-def search(request) :
-    if 'keyword' in request.GET :
-        keyword = request.GET['keyword']
-        if keyword :
+def search(request):
+    products = []
+    product_count = 0
+
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']  # Define 'keyword' before printing it
+        print('keyword:', keyword)  # Now it's safe to print
+
+        if keyword:
             products = Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword) | Q(product_name__icontains=keyword))
             product_count = products.count()
+        
+        print('products:', products)
+        print('product_count:', product_count)    
 
     context = {
-        'products' : products,
-        'product_count' : product_count,
-        }     
-    return render(request , 'store/store.html', context )
+        'products': products,
+        'product_count': product_count,
+    }     
+    return render(request, 'store/store.html', context)
+
+# def search_suggestions(request) :
+#     if 'term' in request.GET :
+#         term = request.GET['term']
+#         suggestions = []
+
+#         # fetching suggestions based on the term from the product model
+#         products = Product.objects.filter(
+#             Q(description__icontains=term) | Q(product_name__icontains=term)
+#         ).values_list('product_name', flat=True) 
+
+#         suggestions = [product_name for product_name in products]
+
+#         return JsonResponse({'suggestions': suggestions} , safe=False)
 
 @login_required(login_url='user_login')
 def wishlist(request):
@@ -66,11 +89,12 @@ def wishlist(request):
     cart_items = CartItem.objects.filter(user=request.user)
     # variations = cart_items.values_list('product_variation', flat=True).distinct()
     # print('variations : ', variations)
+    # wishlist_count = wishlist.count()
     
     context = {
         'wishlist':wishlist,
         'cart_items':cart_items,
-        # 'variations':variations,
+        # 'wishlist_count':wishlist_count,
     }
     return render(request, 'store/wishlist.html', context)
 

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+
+<section class="content-main mt-80 mb-80">
+    {% include 'includes/alerts.html' %}
+    <div class="card mx-auto card-login" style="max-width: 500px;">
+        <div class="card-body text-center">
+            <h4 class="card-title mb-4">Admin Sign-in</h4>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input class="form-control" placeholder="Please Enter email" type="email" name='email' required>
+                </div> <!-- form-group// -->
+                <div class="mb-3">
+                    <input class="form-control" placeholder="Please Enter Password" type="password" name='password' required>
+                </div> <!-- form-group// -->
+                <div class="mb-4">
+                    <button type="submit" class="btn btn-primary w-100"> Login </button>
+                </div> <!-- form-group// -->
+            </form>
+            
+        </div>
+    </div>
+</section>
+
+{% endblock %}

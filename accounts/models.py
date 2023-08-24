@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser , BaseUserManager
 
+
 # Create your models here.
 
 class MyAccountManager(BaseUserManager) :
@@ -51,7 +52,7 @@ class Account(AbstractBaseUser) :
     is_admin       = models.BooleanField(default=False)
     is_staff       = models.BooleanField(default=False)
     is_active       = models.BooleanField(default=True)
-    is_superadmin       = models.BooleanField(default=False)
+    is_superuser       = models.BooleanField(default=False)
     is_blocked     = models.BooleanField(default=False)
 
     USERNAME_FIELD    = 'email'
@@ -68,6 +69,8 @@ class Account(AbstractBaseUser) :
     
     def has_module_perms(self , add_label) :
         return True
+    
+    
     
 class UserProfile(models.Model) :
     user = models.OneToOneField(Account, on_delete=models.CASCADE)
@@ -86,6 +89,13 @@ class UserProfile(models.Model) :
     
     def full_address(self) :
         return f'{self.address_line_1} {self.address_line_2}'
+    
+class Wallet(models.Model):
+    user = models.OneToOneField(Account, on_delete=models.CASCADE)
+    balance = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return self.user.first_name    
 
 
 

@@ -44,7 +44,7 @@
                         <div class="text">
                             <h6 class="mb-1">Order info</h6>
                             <p class="mb-1">
-                                Shipping: Plantopia International <br> Pay method: {{order.payment.payment_method}} <br> Payment Status: {{order.payment.status}}
+                                Shipping: Plantopia International <br> Pay method: {{order.payment.payment_method}} 
                             </p>
                             
                         </div>
@@ -80,7 +80,7 @@
                                     <th width="10%" class="text-center">Total</th>
                                     {% comment %} <th width="10%" class="text-center">status</th> {% endcomment %}
                                     <th width="15%" class="text-center"></th>
-                                    {% comment %} <th width="10%" class="text-center"></th> {% endcomment %}
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -94,7 +94,9 @@
                                     </td>
                                     <td class='text-center align-middle'> ₹{{order_item.product_price}} </td>
                                     <td class='text-center align-middle'> {{order_item.quantity}} </td>
-                                    <td class="text-center align-middle"> ₹{{order_item.total}} </td>
+                                    
+                                    <td class="text-center align-middle"> ₹{{order_item.order.sub_total}} </td>
+                                    
                                     {% comment %} <td class="text-center align-middle">
                                         <span class="badge rounded-pill {% if order_item.status == 'Delivered' %}alert-success text-success {% elif  order_item.status == 'Cancelled' %}alert-danger text-danger {% else %} alert-warning text-warning{% endif %} ">
                                             {{order_item.status}}

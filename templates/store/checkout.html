@@ -76,7 +76,7 @@
                             <div class="card-body">
                                 
                                 <tbody>
-                                    {% for addr in address|slice:":2" %}
+                                    {% for addr in address|slice:":3" %}
                                     <tr>
                                          
                                     <td class="product-col">
@@ -140,12 +140,30 @@
         
                                             <tr>
                                                 <th>SubTotal</th>
-                                                <td class="product-subtotal" colspan="2">₹{{ total_total }}</td>
+                                                <td class="product-subtotal" colspan="2" id="subtotal">₹{{ total_total }}</td>
+                                                <span hidden  colspan="2" id="Subtotal">{{ total_total }}</span>
                                             </tr>
                                             <tr>
                                                 <th>GST</th>
                                                 <td colspan="2"><em>₹{{ GST }}</em></td>
+                                                <span hidden  colspan="2" id="gstValue">{{ GST }}</span>
                                             </tr>
+                                            {% if coupon_discount > 0 %}
+                                            <tr>
+                                                <th>Coupon Discount</th>
+                                                <td colspan="2" class="product-subtotal" >
+                                                <span   class="font-xl text-brand fw-900">₹{{ coupon_discount }}</span>
+                                                <span  hidden id="coupon_discount" class="font-xl text-brand fw-900">{{ coupon_discount }}</span>
+                                                
+                                            </td>
+                                            </tr> 
+                                            {% endif %}
+                                            {% comment %} <tr id="coupon-row">
+                                                <td class="cart_total_label">Coupon Discount</td>
+                                                <td class="cart_total_amount font-lg fw-500 text-brand" id="discount-amount">
+                                                    <span id="coupon-discount" style="display: none;">{{ coupon_discount|default:0 }}</span>
+                                                </td>
+                                            </tr> {% endcomment %}
                                             <tr>
                                                 <th>Total</th>
                                                 <td colspan="2" class="product-subtotal" >
@@ -217,6 +235,16 @@
             
             let addressID = $('.form-check-input:checked').val(); 
             console.log(addressID);
+
+            let subTotal = $('#Subtotal').text().trim();
+            console.log(subTotal);
+            console.log('Subtotal Element:', subTotal);
+
+            let gst = $('#gstValue').text().trim();
+
+            //let sub_tot=parseFloat(subTotal);
+            //console.log(sub_tot);
+            //console.log('Subtotal:', sub_tot);
             
             //let grandPriceText = $('#total_price').text();
            
@@ -233,6 +261,8 @@
                 console.log("Razorpay");
                 const data = {
                     addressID: addressID,
+                    subTotal : subTotal,
+                    GST : gst,
                     grandPriceText: grandTotal,
                     paymentmethod: paymentmethod,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -243,8 +273,9 @@
                     method: 'POST',
                     data: data,
                     success: function(response) {
+                        console.log("razorpay started")
                          razorpay(response);
-                        
+                        var coupon_discount = response.response.coupon_discount;
                          
                     }
                 });
@@ -253,6 +284,8 @@
             } else {  //cod method
                 const data = {
                     addressID: addressID,
+                    subTotal : subTotal,
+                    GST : gst,
                     grandPriceText: grandPriceText,
                     paymentmethod: paymentmethod,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -265,8 +298,11 @@
                     success: function(response) {
                         console.log(response);
                         console.log("code run success");
+                        var coupon_discount = response.response.coupon_discount;
                         console.log(response.response.orders_id);
-                        window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id;
+                        window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id + '&coupon_discount=' + coupon_discount;
+                        //window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id + '&subtotal=' + subTotal + '&GST=' + GST + '&grand_total=' + grandTotal;
+                        
                         
                     }
                 });
@@ -285,7 +321,9 @@
                     "order_id":response.response.payment_id, // Pass the `id` obtained in the response of the server-side order creation
                     "handler": function(Response) {
                        
-                        window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id;
+                        window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id +'&coupon_discount=' + coupon_discount;
+                        //window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id + '&subtotal=' + subTotal + '&GST=' + GST + '&grand_total=' + grandTotal;
+
     
                     },
                    
@@ -310,6 +348,22 @@
     
 
 </script>
+<script>
+    $(document).ready(function() {
+        // ... Other code ...
+
+        // Update the coupon discount element with the value
+        const couponDiscount = parseFloat($('#coupon-discount').text());
+        if (!isNaN(couponDiscount) && couponDiscount > 0) {
+            $('#coupon-row').show();
+            $('#discount-amount').text(`- ₹${couponDiscount}`);
+        }
+        console.log('couponDiscount :',couponDiscount)
+
+        // ... Rest of your script ...
+    });
+</script>
+
 
 
 

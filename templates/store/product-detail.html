@@ -111,24 +111,20 @@
                                                     <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
                                                 </div>
                                                 <div class="product-extra-link2">
-                                                        
-                                                <button  type="submit" class="button button-add-to-cart" id="add-to-cart-btn">Add to cart</button></a>
+                                                    <button type="submit" class="button button-add-to-cart" id="add-to-cart-btn" style="display: inline-block;">Add to cart</button>
                                                     {% comment %} <a aria-label="Add To Wishlist" class="action-btn hover-up" href="{% url 'add_to_wishlist' %}"><i class="fi-rs-heart"></i></a> {% endcomment %}
                                                     {% comment %} <a aria-label="Add To Wishlist" class="action-btn hover-up addToWishlist" href="{% url 'add_to_wishlist' %}" data-product-id="{{ product.id }}">
                                                         <i class="fi-rs-heart"></i>
                                                     </a> {% endcomment %}
-                                                    {% if user.is_authenticated %}
-                                                        <div class='product-extra-link2' style='display:block' id='wishlist-add-b'>
-                                                            <button class='button button-add-to-wishlist' style="padding: 8px 40px;">Add to wishlist</button>
-                                                        </div>
-                                                        
-
-                                                    {% endif %}
                                                     
-                                                    <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
-                                                 
+                                                    {% comment %} <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> {% endcomment %}
+                                                    {% if user.is_authenticated %}
+                                                    <button class="button button-add-to-wishlist" style="display: inline-block; padding: 8px 40px;" id="wishlist-add-b">Add to wishlist</button>
+                                                    {% endif %}
                                                 </div>
-                                                {% comment %} <script>
+                                                
+                                                
+                                                 <script>
                                                     document.addEventListener('DOMContentLoaded', function() {
                                                       document.getElementById('add-to-cart-btn').addEventListener('click', function() {
                                                         window.location.href = "{% url 'add_cart' single_product.id %}";
@@ -158,7 +154,7 @@
                                                         });
                                                     });
                                                     
-                                                </script> {% endcomment %}
+                                                </script> 
                                             </div>
                                             {% endif %}
                                         

@@ -51,10 +51,10 @@
                                     <td class="text-right" data-title="Cart">
                                         {% comment %} <input type='hidden' name='flavour_pro' value="{{item.product_variation.flavour}}">
                                         <input type='hidden' name='weight_pro' value="{{item.product_variation.weight}}"> {% endcomment %}
-                                        {% if item.product_variation.id in variations %}
+                                        {% if item.product.id in product %}
                                         <button type='submit' class="btn btn-sm" disabled><i class="fi-rs-shopping-bag mr-5"></i>Added</button>
                                         {% else %}
-                                        <button type='submit' class="btn btn-sm" {% if item.product_variation.quantity <= 0 %}disabled{% endif %}><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                        <button type='submit' class="btn btn-sm" {% if item.product.quantity <= 0 %}disabled{% endif %}><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
                                         {% endif %}
                                     </td>
                                 </form>
@@ -87,6 +87,7 @@
 {% endblock content %}
 
 {% block script %}
+{% comment %} <script src="path/to/sweetalert.min.js"></script> {% endcomment %}
 <script>
     $(document).on('click', '#removeWishlistItem', function(e) {
         e.preventDefault()
@@ -105,7 +106,7 @@
             if(confirmDelete) {
                 $.ajax({
                     method:"POST",
-                    url:"/cart/del-wishlist-item/",
+                    url:"/store/del_wishlist_item/",
                     data:{
                         'wishlist_item_id':wishlistItemId,
                         'csrfmiddlewaretoken':csrfToken,

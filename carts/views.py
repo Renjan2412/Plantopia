@@ -116,9 +116,9 @@ def cart(request):
 
         GST = (5 * total) / 100
         grand_total = total + GST
-        print('type:' ,type(total))
-        print('type:' ,type(GST))
-        print('type:' ,type(grand_total))
+        print('total:' ,total)
+        print('GST:' ,GST)
+        print('grand_total:' ,grand_total)
 
     except ObjectDoesNotExist:
         pass
@@ -131,10 +131,53 @@ def cart(request):
         'grand_total': grand_total,
         'coupon_form' : coupon_form,
     }
-    # if request.method == 'POST' and coupon_form.is_valid():
-    #     return redirect('cart')
+    if request.method == 'POST' and coupon_form.is_valid():
+         return redirect('cart')
     return render(request, 'store/cart.html', context)
 
+
+
+# def update_cart(request, product_id):
+#     if request.method == "POST" and request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+#         quantity = int(request.POST.get("quantity", 1))
+
+#         try:
+#             cart_item = CartItem.objects.get(product_id=product_id, user=request.user, is_active=True)
+#             cart_item.quantity = quantity
+#             cart_item.sub_total = cart_item.product.price * quantity
+#             cart_item.save()
+
+#             # Recalculate the total, GST, and grand_total based on updated cart items
+#             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+#             total = sum(item.product.price * item.quantity for item in cart_items)
+#             GST = (5 * total) / 100
+#             grand_total = total + GST
+
+#             # Check if a coupon is applied and adjust calculations accordingly
+#             # coupon_discount = 0
+#             # if cart_item.coupon_applied:
+#             #     print("coupon applied on cart")
+#             #     coupon_discount = cart_item.coupon.discount_amount
+#             #     total -= coupon_discount
+
+#             data = {
+#                 "success": True,
+#                 "sub_total": cart_item.sub_total,
+#                 "total": total,
+#                 "GST": GST,
+#                 "grand_total": grand_total,
+#                 # "coupon_applied": cart_item.coupon_applied,
+#                 # "coupon_discount": coupon_discount,
+#                 "new_total_amount": total  # Adjust if needed based on coupon logic
+#             }
+            
+#             return JsonResponse(data)
+#         except CartItem.DoesNotExist:
+#             data = {"success": False, "message": "Cart item not found."}
+#             return JsonResponse(data, status=400)
+#     else:
+#         data = {"success": False, "message": "Invalid request."}
+#         return JsonResponse(data, status=400)
 
 
 
@@ -204,8 +247,20 @@ class CheckoutView(View):
             address = Address.objects.filter(user=request.user)
             GST = (5 * subtotal)/100
             grand_total = subtotal + GST
+
+            coupon_id = request.GET.get('coupon_id')
+            print('coupon_id checkout:',coupon_id)
+            coupon_discount = 0
+            if coupon_id:
+                try:
+                    coupon = Coupon.objects.get(id=coupon_id)
+                    grand_total -= coupon.discount_amount
+                    coupon_discount = coupon.discount_amount
+                except Coupon.DoesNotExist:
+                    pass
             
             
+            print('coupon_discount:',coupon_discount)
             context = {
                 
                 'cart_items': cart_items,
@@ -213,6 +268,7 @@ class CheckoutView(View):
                 'total_total': subtotal,
                 'cart': cart.cart_id,
                 'GST':GST,
+                'coupon_discount':coupon_discount,
                 'grand_total':grand_total,
             }
             print("####",context)
@@ -224,46 +280,8 @@ class CheckoutView(View):
 
             return render(request, 'store/checkout.html', context)
         except Cart.DoesNotExist:
-            # Handle the case when the Cart object doesn't exist
-            # You can redirect the user to a cart creation page or display an error message
+            pass
             return HttpResponse("Cart does not exist.")
-
-    
-    
-# def add_address(request):
-#         if request.method == 'POST':
-#             print('post : ',request.POST)
-#             first_name = request.POST.get('first_name')
-#             last_name = request.POST.get('last_name')
-#             address_line_1 = request.POST.get('address_line_1')
-#             address_line_2 = request.POST.get('address_line_2')
-#             phone_number = request.POST.get('phone_number')
-#             email = request.POST.get('email')
-#             city = request.POST.get('city')
-#             state= request.POST.get('state')
-#             country= request.POST.get('country')
-#             order_note = request.POST.get('order_notes')
-#             # print(request.body)
-#             # print(name, city, pincode, phone,address)
-
-#             address = Address.objects.create(
-#                 user=request.user,
-#                 first_name=first_name,
-#                 last_name=last_name,
-#                 address_line_1=address_line_1,
-#                 address_line_2=address_line_2,
-#                 city=city,
-#                 state=state,
-#                 phone_number=phone_number,
-#                 country=country,
-#                 email=email,
-#                 order_note=order_note,
-#             )
-#             address.save()
-#             return redirect('checkout')  
-        
-#         return render(request, 'accounts/add_address.html') 
-# 
 
 @login_required
 def add_address(request):
@@ -274,7 +292,7 @@ def add_address(request):
             address.save()
             address.user.add(request.user)
             
-            return redirect('checkout')  # Replace 'checkout' with the appropriate URL name
+            return redirect('checkout')  
     else:
         form = AddressForm()
     

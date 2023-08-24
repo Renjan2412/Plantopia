@@ -48,25 +48,16 @@
                 </div> {% endcomment %}
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="categoryTable">
                             <thead>
                                 <tr>
-                                    {% comment %}
-                                    <th class="text-center">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" />
-                                        </div>
-                                    </th>
-                                    {% endcomment %}
-                                    {% comment %}
-                                    <th>ID</th>
-                                    {% endcomment %}
+                                   
                                     <th style="width: 200px;" class="text-center">Name</th>
                                     <th style="width: 300px;" class="text-center">Description</th>
                                     <th style="width: 200px;" class="text-center">Slug</th>
                                     <th style="width: 150px;" class="text-center">Image</th>
                                     <th class="text-end" style="width: 60px;" class="text-center">Action</th>
-                                    <th></th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -76,9 +67,7 @@
                                     <td style="vertical-align: middle;" class="text-center">{{ca.description}}</td>
                                     <td style="vertical-align: middle;" class="text-center">{{ca.slug}}</td>
                                     <td style="vertical-align: middle;" class="text-center"><img src="{{ca.cat_image.url}}"></td>
-                                    {% comment %}
-                                    <td style="vertical-align: middle;" class="text-center">{{ca.cat_image.url}}</td>
-                                    {% endcomment %}
+                                    
                                     <td class="text-end" style="vertical-align: middle;" class="text-center">
                                         <div class="dropdown">
                                             <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -104,3 +93,16 @@
 </section> <!-- content-main end// -->
 
 {% endblock %}
+{% block script %}
+<script>
+    $('#categoryTable').DataTable({
+        paging:true,
+        pageLength:2,
+        lengthChange:true,
+        autoWidth:true,
+        searching:true,
+        bInfo:true,
+        bSort:false,
+    })
+</script>
+{% endblock script %}

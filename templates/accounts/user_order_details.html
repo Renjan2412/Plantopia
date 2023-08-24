@@ -31,7 +31,7 @@
                                             {% if order.order_total > 0 %}
                                             
                                                 <p class="mb-2">Payment method : {{order.payment.payment_method}} </p>
-                                                <p class="mb-2">Payment Status : {{order.payment.status}}</p>
+                                                <p class="mb-2">Payment Status : {{order.status}}</p>
                                                 {% if order.coupon %}
                                                     <p class="mb-2">Coupon: {{order.coupon.code}} </p>
                                                 {% endif %}
@@ -89,16 +89,10 @@
                                                     </td>
                                                     <td>{{product.quantity}}</td>
                                                     <td>₹ {{product.product_price}}</td>
-                                                    <td>₹ {{product.total}}</td>
+                                                    <td>₹ {{product.order.sub_total}}</td>
                                                     <td>{{product.status}}</td>
-                                                    <td>
-                                                        {% if order.status == 'Delivered' %}	
-																		<a href="" class="returnorder" ><button class="btn btn-outline-warning return">RETURN</button></a>
-															{% else %}
-																	<a href="{% url 'cancel_order' order.id %}" class="returnorder"><button class="btn btn-outline-warning return">CANCEL</button></a>
-														{% endif %}
-                                                    </td>
-                                                    {% comment %} {% if product.status == 'Delivered' %}
+                                                    
+                                                    {% if product.status == 'Delivered' %}
                                                         <td><a class='btn btn-secondary' id='user-ord-retrn' data-orderproduct-id="{{product.id}}">Return Product</a></td>
                                                     {% elif product.status == 'Returned' %}
                                                     <td><span class="badge rounded-pill alert-warning text-warning">Order Returned</span>&nbsp;&nbsp;&nbsp; <span class="badge rounded-pill alert-dark text-white">Amount Refunded to wallet</span></td>
@@ -107,23 +101,21 @@
                                                     {% elif product.status == 'Return Requested'%}
                                                     <td><span class="badge rounded-pill alert-warning text-warning">{{product.status}}</span></td>
                                                     {% elif product.status != 'Cancelled' %}
-                                                        <td>
-                                                            <a class='btn' id='user-act' data-orderproduct-id="{{product.id}}">Cancel Product </a> 
-                                                            <a class='btn' id='user-act' data-orderproduct-id="{{product.id}}">Cancel Product</a>
-                                                        </td>
+                                                        <td><a class='btn' id='user-act' data-orderproduct-id="{{product.id}}">Cancel Product </a></td>
                                                         
                                                     {% else %}
-                                                        <td>
-                                                            <span class="badge rounded-pill alert-danger text-danger">Order Canceled</span> 
-                                                            <span class="badge rounded-pill alert-danger text-danger">Product Cancelled</span>
-                                                            
+                                                        <td><span class="badge rounded-pill alert-danger text-danger">Order Canceled</span>
+                                                            {% if product.order.payment.status == 'COMPLETED' %}
+                                                            &nbsp;&nbsp;&nbsp; <span class="badge rounded-pill alert-dark text-white">Amount Refunded to wallet</span>
+                                                            {% endif %}
                                                         </td>
-                                                    {% endif %} {% endcomment %}
+                                                    {% endif %}
                                                     
                                                     
                                                     {% if product.status == 'Delivered' %}
-                                                    <td><a href="{% url 'invoice' %}" class='btn btn-sm btn-info'>Invoice</a></td>
+                                                    <td><a href="{% url 'invoice' product.id %}" class='btn btn-sm btn-info'>Invoice</a></td>
                                                     {% endif %}
+                                                    
                                                 </tr>
                                                 {% endfor %}
                                                 <tr>
@@ -133,11 +125,15 @@
                                                                 {% if order.order_total > 0 %}
                                                                 <dl class="d-flex justify-content-between">
                                                                     <dt>Subtotal:</dt>
-                                                                    <dd>₹{{order.order_total_amount}}</dd>
+                                                                    <dd>₹{{order.sub_total}}</dd>
                                                                 </dl>
                                                                 <dl class="d-flex justify-content-between">
                                                                     <dt>Shipping cost:</dt>
                                                                     <dd>Free</dd>
+                                                                </dl>
+                                                                <dl class="d-flex justify-content-between">
+                                                                    <dt>GST:</dt>
+                                                                    <dd>{{order.GST}}</dd>
                                                                 </dl>
                                                                 {% if order.discount_amount != 0 %}
                                                                 <dl class="d-flex justify-content-between">
@@ -178,3 +174,47 @@
 </main>
 
 {% endblock content %}
+{% block script %}
+<script>
+$(document).on('click', '#user-act', function() {
+    console.log('button clicked...')
+    var orderproductId = $(this).data('orderproduct-id')
+    console.log('orderproduct id : ', orderproductId)
+    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val()
+    console.log('csrf token : ', csrfToken)
+
+    swal({
+        title:"Are You Sure",
+        text:"Do You Want to Cancel This Ordered Product",
+        icon:"warning",
+        buttons:['Cancel', 'Yes'],
+        dangerMode:true
+    }).then(function(confirmYes) {
+        
+        if (confirmYes) {
+            $.ajax({
+                method:"POST",
+                url:"/orders/order-act/",
+                data:{
+                    'orderproduct_id':orderproductId,
+                    'csrfmiddlewaretoken':csrfToken,
+                },
+                success:function(response){
+                    swal({
+                        title:"",
+                        text:"",
+                        icon:"success",
+                        timer:4000,
+                        button:false,
+                    }).then(function(){
+                        $('#user-order-det-block').load(location.href + ' #user-order-det-block');
+                    })
+                },
+            })
+        }
+        
+    })
+
+})
+</script>
+{% endblock script %}

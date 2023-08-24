@@ -46,7 +46,9 @@
                                             <h5 class="product-name"><a href="{{ cart_item.product.get_url }}">{{ cart_item.product.product_name }}</a></h5>
                                             <p class="font-xs">{{ cart_item.product.catagory }}</p>
                                         </td>
-                                        <td class="price" data-title="Price"><span>₹{{ cart_item.product.price }} </span></td>
+                                        <td class="price" data-title="Price"><span class="product-price">₹{{ cart_item.product.price }}</span></td>
+
+                                        {% comment %} <td class="price" data-title="Price"><span>₹{{ cart_item.product.price }} </span></td> {% endcomment %}
                                         <td class="text-center" data-title="Stock">
                                                 <div class="detail-qty border radius  m-auto">
                                                     <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
@@ -75,7 +77,7 @@
                     <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
                     <div class="row mb-50">
                         <div class="col-lg-6 col-md-12">
-                            
+                            {% if user.is_authenticated %}
                             <div class="mb-30 mt-50">
                                 <div class="heading_s1 mb-3">
                                     <h4>Apply Coupon</h4>
@@ -83,28 +85,31 @@
                                 <div class="total-amount">
                                     <div class="left">
                                         <div class="coupon">
-                                            <form action="#" target="_blank" method = "POST">
+                                            <form action="#" target="_blank" method = "POST" id='coupon-form'>
                                                 {% csrf_token %}
-                                                <div class="form-row row justify-content-center">
-                                                    {{ coupon_form }}
-                                                    {% comment %} <div class="form-group col-lg-6">
-                                                        <input class="font-medium" name="Coupon" placeholder="Enter Your Coupon">
-                                                    </div> {% endcomment %}
-                                                    <div class="form-group col-lg-6">
-                                                        <button type="submit" class="btn  btn-sm"><i class="fi-rs-label mr-10"></i>Apply</button>
+                                                <div class="form-row row justify-content-center align-items-center">
+                                                    {% comment %} {{ coupon_form }} {% endcomment %}
+                                                    <input class="font-medium" name="Coupon" placeholder="Enter Your Coupon">
+                                                    
+                                                    <div class="form-group col-lg-12 d-flex justify-content-end pt-3">
+                                                        <button type="submit" class="btn  btn-md"><i class="fi-rs-label mr-10"></i>Apply</button>
+                                                        <input type="hidden" name="coupon_id" value="{{ coupon_id }}">
+
                                                     </div>
                                                 </div>
                                             </form>
-                                            {% if coupon_error %}
+                                            <h5 id='resp'></h5>
+                                            {% comment %} {% if coupon_error %}
                                                 <p class="text-danger">{{ coupon_error }}</p>
                                             {% endif %}
                                             {% if applied_coupon %}
                                                 <p class="text-success">Coupon applied: {{ applied_coupon.code }}</p>
-                                            {% endif %}
+                                            {% endif %} {% endcomment %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="col-lg-6 col-md-12">
                             <div class="border p-md-4 p-30 border-radius cart-totals">
@@ -116,20 +121,24 @@
                                         <tbody>
                                             <tr>
                                                 <td class="cart_total_label">Cart Subtotal</td>
-                                                <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">₹{{ total }}</span></td>
+                                                <td class="cart_total_amount"><span class="font-lg fw-900 text-brand" id ='cart-subtotal'>₹{{ total }}</span></td>
                                             </tr>
                                             <tr>
                                                 <td class="cart_total_label">GST</td>
-                                                <td class="cart_total_amount"> <i class="ti-gift mr-5"></i>₹{{ GST }}</td>
+                                                <td class="cart_total_amount"> <i class="ti-gift mr-5" id="gst-amount"></i>₹{{ GST }}</td>
+                                            </tr>
+                                            <tr id='coupon-row' style="display:none;">
+                                              <td class="cart_total_label">Coupon Discount</td>
+                                              <td class="cart_total_amount font-lg fw-500 text-brand" id="discount-amount"></td>
                                             </tr>
                                             <tr>
                                                 <td class="cart_total_label">Grand Total</td>
-                                                <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">₹{{ grand_total }}</span></strong></td>
+                                                <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand" id='total_amnt'>₹{{ grand_total }}</span></strong></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <a href="{% url 'checkout' %}" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                <a href="{% url 'checkout' %}" class="btn " id='proceed-chekout'> <i class="fi-rs-box-alt mr-10" ></i> Proceed To CheckOut</a>
                             </div>
                         </div>
                     </div>
@@ -140,7 +149,9 @@
     </section>
 </main>
 
+{% endblock content %} 
 
+{% block script %}
 
 <!-- Include jQuery library -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -176,7 +187,7 @@
             updatePriceAndTotal(response);
           },
           error: function(xhr, status, error) {
-            console.log(xhr.responseText);
+            //console.log(xhr.responseText);
           }
         });
       });
@@ -187,6 +198,7 @@
         var quantity = parseInt(quantityElement.text());
         var newQuantity = quantity - 1;
         var productId = $(this).closest("tr").data("product-id");
+        //console.log(quantityElement)
   
         if (newQuantity < 1) {
           return;
@@ -198,46 +210,81 @@
           method: "POST",
           data: { quantity: newQuantity },
           success: function(response) {
+            //console.log(response)
             quantityElement.text(newQuantity);
+          
             updatePriceAndTotal(response);
           },
           error: function(xhr, status, error) {
-            console.log(xhr.responseText);
+            //console.log(xhr.responseText);
           }
         });
       });
   
       // Function to update price and total based on the response
       function updatePriceAndTotal(response) {
+        console.log("response in update ")
+        console.log(response)
         if (response.success) {
           var subTotalElements = $(".sub_total_price");
+          //console.log('subtotal :')
+          //console.log(subTotalElements)
           var totalElement = $(".cart_total_amount span");
           var GSTElement = $(".cart_total_amount").eq(1);
           var grandTotalElement = $(".cart_total_amount").eq(2);
       
           // Update subtotals for each product
           subTotalElements.each(function(index) {
-            var quantityElement = $(this).closest("tr").find(".qty-val");
-            var price = parseFloat($(this).closest("tr").find(".price span").text().replace("$", ""));
-            var quantity = parseInt(quantityElement.text());
+            var quantityElement = $(this).closest("tr").find(".qty-val").text();
+            //console.log("quantityElement")
+            //console.log(quantityElement)
+
+            //var price =parseFloat($(this).closest("tr").find(".price span").text().replace("₹", ""))
+            var price = parseFloat($(this).closest("tr").find(".product-price").text().replace("₹", ""));
+
+            console.log("price")
+            console.log(price)
+            var quantity = parseInt(quantityElement);
+            //console.log("quantity")
+            //console.log(quantity)
+
             var newSubTotal = price * quantity;
-            $(this).text("$" + newSubTotal.toFixed(2));
+            //console.log(newSubTotal)
+            $(this).text("₹ " + newSubTotal.toFixed(2));
           });
-      
+          
+          ///var newTotalAmount = response.new_total_amount;
           // Calculate total based on updated subtotals
           var newTotal = 0;
           subTotalElements.each(function(index) {
-            var subtotal = parseFloat($(this).text().replace("$", ""));
+            var subtotal = parseFloat($(this).text().replace("₹ ", ""));
             newTotal += subtotal;
           });
+          console.log('newTotal:')
+          console.log(newTotal)
       
           // Calculate GST and grand total based on updated total
           var newGST = (5 * newTotal) / 100;
+          console.log('newGST')
+          console.log(newGST)
           var newGrandTotal = newTotal + newGST;
-      
-          totalElement.text("$" + newTotal.toFixed(2));
-          GSTElement.text("$" + newGST.toFixed(2));
-          grandTotalElement.text("$" + newGrandTotal.toFixed(2));
+          console.log('newGrandTotal')
+          console.log(newGrandTotal)
+          //var newGST = (5 * newTotalAmount) / 100;
+          //var newGrandTotal = newTotalAmount + newGST;
+          totalElement.text("₹ " + newTotal.toFixed(2));
+          console.log('totalElement')
+          console.log(totalElement)
+          GSTElement.text("₹ " + newGST.toFixed(2));
+          console.log('GSTElement')
+          console.log(GSTElement)
+          grandTotalElement.text("₹ " + newGrandTotal.toFixed(2));
+          console.log('grandTotalElement')
+          console.log(grandTotalElement)
+          ///totalElement.text("₹ " + newTotalAmount.toFixed(2));
+          ///GSTElement.text("₹ " + newGST.toFixed(2));
+          ///grandTotalElement.text("₹ " + newGrandTotal.toFixed(2));
+         
         }
       }
       
@@ -259,9 +306,110 @@
         return cookieValue;
       }
     });
-  </script> 
- 
-  {% endblock content %} 
+</script> 
+  {% comment %} <script>
+    
+    var url = $('#proceed-chekout').attr('href')
+    console.log(url)
+    $(document).on('submit', '#coupon-form', function(e){
+        e.preventDefault()
+        
+       var che_url = url 
+       console.log('che_url:')
+       console.log(che_url)
+        $('#resp').removeClass()
+        $('#coupon-row').css({'display':'none',})
+        var tot_amt = $('#total_amnt').text()
+        var formData = new FormData(this)
+        $.ajax({
+            method:'POST',
+            url:'/offer/coupon_verify/',
+            data:formData,
+            processData:false,
+            contentType:false,
+            success:function(response){
+                   
+                if (response.message == 'Coupon has been Applied'){
+                    $('#resp').text(response.message).addClass('text-success')
+                    $('#coupon-row').css({
+                        'display':'table-row',
+                    })
+                    $('#discount-amount').text('₹' + response.coupon_discount)
+                    //$('#total_amnt').text('₹' + response.final_amount)
+                     // Calculate the new total amount including GST
+                    var newTotalAmountWithGST = response.new_total_amount + response.gst_amount;
+                    $('#total_amnt').text('₹' + newTotalAmountWithGST.toFixed(2));
+
+
+                    $('#proceed-chekout').attr('href', che_url+response.coupon_id+'/')
+                } else if(response.message.includes('Please')) {
+                    
+                    $('#resp').text(response.message).addClass('text-warning')
+                    $('#total_amnt').text(tot_amt)
+                    $('#proceed-chekout').attr('href', che_url)
+                } else {
+                    $('#resp').text(response.message).addClass('text-danger')
+                    $('#total_amnt').text(tot_amt)
+                    $('#proceed-chekout').attr('href', che_url)
+                }
+                
+            }   
+        })
+    })
+  </script>   {% endcomment %}
+  <script>
+    var url = $('#proceed-chekout').attr('href');
+    console.log(url);
+    
+    $(document).on('submit', '#coupon-form', function(e) {
+        e.preventDefault();
+
+        var che_url = url;
+        console.log('che_url:');
+        console.log(che_url);
+
+        $('#resp').removeClass();
+        $('#coupon-row').css({ 'display': 'none' });
+        var tot_amt = $('#total_amnt').text();
+        var formData = new FormData(this);
+        
+        $.ajax({
+            method: 'POST',
+            url: '/offer/coupon_verify/',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.message == 'Coupon has been Applied') {
+                    $('#resp').text(response.message).addClass('text-success');
+                    $('#coupon-row').css({
+                        'display': 'table-row',
+                    });
+
+                    // Update coupon discount amount and total amount
+                    $('#discount-amount').text('₹' + response.coupon_discount.toFixed(2));
+                    var newTotalAmountWithGST = response.final_amount;
+                    $('#total_amnt').text('₹' + newTotalAmountWithGST.toFixed(2));
+
+                    // Update the checkout link to include coupon ID
+                    $('#proceed-chekout').attr('href', che_url + '?coupon_id=' + response.coupon_id);
+                } else if (response.message.includes('Please')) {
+                    $('#resp').text(response.message).addClass('text-warning');
+                    $('#total_amnt').text(tot_amt);
+                    $('#proceed-chekout').attr('href', che_url);
+                } else {
+                    $('#resp').text(response.message).addClass('text-danger');
+                    $('#total_amnt').text(tot_amt);
+                    $('#proceed-chekout').attr('href', che_url);
+                }
+            }
+        });
+    });
+</script>
+
+
+{% endblock script %}
+
   
 
   

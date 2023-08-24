@@ -19,7 +19,7 @@
                     <div class="row">
                         {% include 'includes/user_dashboard_sidebar.html' %}
                         <div class="col-md-8">
-                            {% if orders %}
+                            {% if paged_orders %}
                             
                                 
                                     <div class="card">
@@ -42,7 +42,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {% for i in orders %}
+                                                        {% for i in paged_orders %}
                                                         <tr>
                                                             <td>{{i.id}}</td>
                                                             <td>{{i.address.full_name}}</td>
@@ -72,12 +72,40 @@
                                         </div>
                                     </div>
                                 
-                                
+                                     
                             {% else %}
                             <div class='text-center'>
                                 <h3> Order detail is empty </h3>
                             </div>
                             {% endif %}
+                            <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
+                                <nav aria-label="Page navigation example">
+                                    {% if paged_orders.has_other_pages %}
+                                        <ul class="pagination justify-content-start">
+                                            {% for i in paged_orders.paginator.page_range %}
+                                                {% if paged_orders.number == i %}
+                                                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                                                {% else %}
+                                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if paged_orders.has_next %}
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page={{ paged_orders.next_page_number }}">
+                                                        <i class="fi-rs-angle-double-small-right"></i>
+                                                    </a>
+                                                </li>
+                                            {% else %}
+                                                <li class="page-item disabled">
+                                                    <a class="page-link" href="#">
+                                                        <i class="fi-rs-angle-double-small-right"></i>
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    {% endif %}
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </div>

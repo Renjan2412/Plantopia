@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from .forms import RegistrationForm,UserForm,UserProfileForm
-from .models import Account , UserProfile
+from .models import Account , UserProfile,Wallet
 from django.contrib import messages,auth
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
@@ -13,16 +13,21 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from carts.views import _cart_id
-from carts.models import Cart,CartItem
+from carts.models import Cart,CartItem,Address
+from carts.forms import AddressForm
 import requests,logging
 from urllib.parse import urlparse, parse_qs
 from orders.models import Order,OrderProduct
+from store .models import Wishlist
+from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
 
 # Create your views here.
 
 
 def home(request):
-    sort_option = request.GET.get('sort_option', 'default')
+    sort_option = request.GET.get('sort_option', 'Default')
 
     if sort_option == 'Name, A to Z':
         products = Product.objects.filter(is_available=True).order_by('product_name')
@@ -34,10 +39,15 @@ def home(request):
         products = Product.objects.filter(is_available=True).order_by('-price')
     else:
         products = Product.objects.filter(is_available=True)
+        
+    sliced_products = products[:4]
+
+      
 
     context = {
-        'products': products,
+        'products': sliced_products,
         'sort_option': sort_option,
+        
     }
     return render(request, 'home.html', context)
 
@@ -114,14 +124,17 @@ def user_login(request) :
 
 def login_otp(request) :
      if request.user.is_authenticated:
+        print('1')
         return redirect('home')
      if request.method == 'POST':
+        print('11')
         phone_number = request.POST['phone_number']
         # if not re.match(r'^[0-9]+$',phone_number):
         #     messages.error(request,'Phone number should contain only digits')
         # if len(phone_number)<10:
         #     messages.error(request,'Please provide a valid Phone number')
         if Account.objects.all().filter(phone_number=phone_number):
+            print('111')
             phone_number_with_country_code='+91'+phone_number
             send(phone_number_with_country_code)
             return redirect(login_otp_verify,phone_number)
@@ -159,14 +172,18 @@ def logout(request) :
 @login_required(login_url = 'user_login')
 def dashboard(request) :
     orders = Order.objects.order_by('-updated_at').filter(user_id=request.user.id)
-    userprofile = UserProfile.objects.filter(user=request.user)
+    userprofile = UserProfile.objects.filter(user=request.user)    
     order_count = orders.count()
-    context = {
-        
+    try :
+        wallet_amount = Wallet.objects.get(user_id = request.user.id).balance
+    except ObjectDoesNotExist:
+            wallet_amount = None
+    context = {       
         'order_count':order_count,
         'user_profile':userprofile,
+        'wallet_amount':wallet_amount,
     }
-    return render(request , 'accounts/dashboard.html')
+    return render(request , 'accounts/dashboard.html',context)
 
 
 
@@ -228,8 +245,14 @@ def edit_profile(request) :
 
 
 def my_orders(request) :
-    orders = Order.objects.filter(user=request.user).order_by('-updated_at') 
-    return render(request,'accounts/my_orders.html',{'orders':orders})
+    orders = Order.objects.filter(user=request.user).order_by('-updated_at')
+    paginator = Paginator(orders,10)
+    print('paginator:',paginator)
+    page = request.GET.get('page')
+    print('page:',page)
+    paged_orders = paginator.get_page(page)
+    print('paged_orders:',paged_orders) 
+    return render(request,'accounts/my_orders.html',{'paged_orders':paged_orders})
 
 def user_order_details(request,id) :
     
@@ -245,6 +268,51 @@ def user_order_details(request,id) :
     }
     return render(request,'accounts/user_order_details.html',context)
 
+@login_required(login_url = 'user_login')
+def my_address(request):
+    
+    
+    if request.method == "POST":
+
+        address_id = request.POST['addr_id']
+        if address_id == '':
+            form = AddressForm(request.POST)
+            if form.is_valid():
+                address = form.save(commit=False)
+                address.user = request.user
+                address.save()
+                return JsonResponse({'title':'Success', 'text':'Address Updated','icon':'success'})
+            else:
+                return JsonResponse({'title':'Error', 'text':'Please fill the enter valid address','icon':'warning'})
+
+        else:
+            
+            address = Address.objects.get(id=address_id)
+            
+            form = AddressForm(request.POST,instance=address)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({'title':'Success', 'text':'Address Updated','icon':'success'})
+            else:
+                return JsonResponse({'title':'Error', 'text':'Please fill the enter valid address','icon':'warning'})
+
+    addresses = Address.objects.all().filter(user=request.user)
+    form = AddressForm()
+    context = {
+        'form':form,
+        'addresses':addresses,
+    }
+    return render(request,'accounts/my_address.html',context)
+    
+@login_required(login_url='user_login')
+def del_addr(request,address_id):
+    
+    try:
+        address = Address.objects.get(id=address_id)
+        address.delete()
+        return JsonResponse({'msg':'Deleted successfully'})
+    except Address.DoesNotExist:
+        pass
 
 
 

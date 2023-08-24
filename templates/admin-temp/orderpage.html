@@ -38,7 +38,7 @@
         </header> <!-- card-header end// --> {% endcomment %}
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover" id="orderTable">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -48,6 +48,8 @@
                             <th scope="col">Date</th>
                             <th scope="col">Status</th>               
                             <th scope="col" class="text-end"> Action </th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -347,4 +349,17 @@
 </section>
 
 {% endblock %}
+{% block script %}
+<script>
+    $('#orderTable').DataTable({
+        paging:true,
+        pageLength:10,
+        lengthChange:true,
+        autoWidth:true,
+        searching:true,
+        bInfo:true,
+        bSort:false,
+    })
+</script>
+{% endblock script %}
 

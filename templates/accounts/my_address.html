@@ -105,7 +105,7 @@
 
                                             <div class="pt-20">
                         
-                                                <a href="{% url 'add_address' %}" class="btn btn-primary btn-sm rounded"  href="{% url 'add_address' %}"><i class="fi fi-rs-plus"
+                                                <a href="{% url 'add_address' %}" class="btn btn-primary btn-sm rounded" ><i class="fi fi-rs-plus"
                                                         style="vertical-align: middle; font-size:16px;"></i> New Address</a>
                                             </div>
                                             <div class='pt-20'>
@@ -157,6 +157,28 @@
                 })
             }
         });
+    });
+</script>
+<script>
+    $(document).on('click', '#newAdd', function(e){
+        e.preventDefault();
+        
+    
+        // Reset the form fields to empty values or default values
+        $('#address-form input[name="first_name"]').val('');
+        $('#address-form input[name="last_name"]').val('');
+        $('#address-form input[name="email"]').val('');
+        $('#address-form input[name="address_line1"]').val('');
+        $('#address-form input[name="address_line2"]').val('');
+        $('#address-form input[name="phone"]').val('');
+        $('#address-form input[name="city"]').val('');
+        $('#address-form input[name="state"]').val('');
+        $('#address-form input[name="country"]').val('');
+        $('#address-form input[name="postcode"]').val('');
+    
+        $('#newAddressModalLabel').text('New Address');
+    
+        $('#newAddressModal').modal('show');
     });
 </script>
 {% endblock script %}

@@ -10,9 +10,6 @@ from .forms import CatagoryForm
 
 # Create your views here.
 
-# def my_view(request) :
-#      # form = MyForm()
-#      return render(request,'admin-temp/catagory.html' )
 
 def my_admin_category(request):
     cate= Catagory.objects.all()
@@ -29,10 +26,7 @@ def catagory_add(request) :
         catagory_slug = request.POST.get('catagory_slug')
         catagory_description = request.POST.get('catagory_description')
         catagory_image = request.FILES.get('catagory_image')
-        # print('request.POST :',request.POST)
-        # print('request.FILES :',request.FILES)
-        # print('catagory_image :',catagory_image)
-        
+    
         catagory = Catagory(
              catagory_name = catagory_name ,
              slug = catagory_slug ,
@@ -48,7 +42,7 @@ def catagory_add(request) :
 @never_cache
 @login_required(login_url='user_login')
 def update_catagory(request , id):
-    if request.user.is_superadmin:
+    if request.user.is_superuser:
         catagory = get_object_or_404(Catagory, id=id)
         if request.method == "POST":
             form = CatagoryForm(request.POST, request.FILES, instance=catagory)

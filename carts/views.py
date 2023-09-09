@@ -70,11 +70,14 @@ def remove_cart(request , product_id) :
     except CartItem.DoesNotExist :
         pass        
     return redirect('cart')   
-
-def remove_cart_item(request,product_id) :
-    cart = Cart.objects.get(cart_id =_cart_id(request))
-    product = get_object_or_404(Product,id =product_id)
-    cart_item = CartItem.objects.get(product=product,cart=cart)
+# 
+def remove_cart_item(request,product_id,cart_item_id):
+    product = Product.objects.get(id=product_id)
+    if request.user.is_authenticated:
+        cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)
+    else:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_item = CartItem.objects.get(product_variation=product,cart=cart,id=cart_item_id)
     cart_item.delete()
     return redirect('cart')  
 
@@ -137,52 +140,8 @@ def cart(request):
 
 
 
-# def update_cart(request, product_id):
-#     if request.method == "POST" and request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-#         quantity = int(request.POST.get("quantity", 1))
-
-#         try:
-#             cart_item = CartItem.objects.get(product_id=product_id, user=request.user, is_active=True)
-#             cart_item.quantity = quantity
-#             cart_item.sub_total = cart_item.product.price * quantity
-#             cart_item.save()
-
-#             # Recalculate the total, GST, and grand_total based on updated cart items
-#             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
-#             total = sum(item.product.price * item.quantity for item in cart_items)
-#             GST = (5 * total) / 100
-#             grand_total = total + GST
-
-#             # Check if a coupon is applied and adjust calculations accordingly
-#             # coupon_discount = 0
-#             # if cart_item.coupon_applied:
-#             #     print("coupon applied on cart")
-#             #     coupon_discount = cart_item.coupon.discount_amount
-#             #     total -= coupon_discount
-
-#             data = {
-#                 "success": True,
-#                 "sub_total": cart_item.sub_total,
-#                 "total": total,
-#                 "GST": GST,
-#                 "grand_total": grand_total,
-#                 # "coupon_applied": cart_item.coupon_applied,
-#                 # "coupon_discount": coupon_discount,
-#                 "new_total_amount": total  # Adjust if needed based on coupon logic
-#             }
-            
-#             return JsonResponse(data)
-#         except CartItem.DoesNotExist:
-#             data = {"success": False, "message": "Cart item not found."}
-#             return JsonResponse(data, status=400)
-#     else:
-#         data = {"success": False, "message": "Invalid request."}
-#         return JsonResponse(data, status=400)
-
-
-
 def update_cart(request, product_id):
-    if request.method == "POST" and request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':  # Check if it's an AJAX request
         quantity = int(request.POST.get("quantity", 1))
 
         try:
@@ -196,19 +155,28 @@ def update_cart(request, product_id):
             total = sum(item.product.price * item.quantity for item in cart_items)
             GST = (5 * total) / 100
             grand_total = total + GST
-            print('type:' ,type(total))
-            print('type:' ,type(GST))
-            print('type:' ,type(grand_total))
+
+            # Check if a coupon is applied and adjust calculations accordingly
+            coupon_discount = 0
+            if cart_item.coupon_code:
+                print("Coupon applied on cart")
+                coupon_discount = cart_item.discount_amount
+                total -= coupon_discount
 
             data = {
                 "success": True,
                 "sub_total": cart_item.sub_total,
                 "total": total,
                 "GST": GST,
-                "grand_total": grand_total
+                "grand_total": grand_total,
+                "coupon_applied": cart_item.coupon_code,
+                "coupon_discount": coupon_discount,
+                "new_total_amount": total  # Adjust if needed based on coupon logic
             }
-            print('data: ',data)
-            
+            print('total update:' ,total)
+            print('GST update:' ,GST)
+            print('grand_total update:' ,grand_total)
+
             return JsonResponse(data)
         except CartItem.DoesNotExist:
             data = {"success": False, "message": "Cart item not found."}
@@ -218,20 +186,10 @@ def update_cart(request, product_id):
         return JsonResponse(data, status=400)
 
 
-
-
-
-
 def calculate_total(request):
     cart_items = CartItem.objects.filter(user=request.user)
     total = sum(item.sub_total() for item in cart_items)
     return total
-
-
-
-
-
-
 
 class CheckoutView(View):
     # @login_required
@@ -270,33 +228,13 @@ class CheckoutView(View):
                 'GST':GST,
                 'coupon_discount':coupon_discount,
                 'grand_total':grand_total,
+                'coupon_id' : coupon_id,
             }
             print("####",context)
-
-            # storing GST into session 
-
-            # request.session['order_GST'] = GST
-            # request.session['total_total'] = subtotal
 
             return render(request, 'store/checkout.html', context)
         except Cart.DoesNotExist:
             pass
             return HttpResponse("Cart does not exist.")
 
-@login_required
-def add_address(request):
-    if request.method == 'POST':
-        form = AddressForm(request.POST)
-        if form.is_valid():
-            address = form.save(commit=False)
-            address.save()
-            address.user.add(request.user)
-            
-            return redirect('checkout')  
-    else:
-        form = AddressForm()
-    
-    # Retrieve all addresses associated with the current user
-    user_addresses = Address.objects.filter(user=request.user)
-
-    return render(request, 'accounts/add_address.html', {'form': form, 'user_addresses': user_addresses})   
+  

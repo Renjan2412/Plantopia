@@ -23,7 +23,7 @@
                                 <div class="col-md-6">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h5>Order Number : #{{order.id}}</h5>
+                                            <h5>Order Number : #{{order.order_number}}</h5>
                                         </div>
                                         <div class="card-body">
                                             
@@ -31,7 +31,7 @@
                                             {% if order.order_total > 0 %}
                                             
                                                 <p class="mb-2">Payment method : {{order.payment.payment_method}} </p>
-                                                <p class="mb-2">Payment Status : {{order.status}}</p>
+                                                {% comment %} <p class="mb-2">Payment Status : {{order.status}}</p> {% endcomment %}
                                                 {% if order.coupon %}
                                                     <p class="mb-2">Coupon: {{order.coupon.code}} </p>
                                                 {% endif %}
@@ -216,5 +216,43 @@ $(document).on('click', '#user-act', function() {
     })
 
 })
+</script>
+<script>
+    $(document).on('click', '#user-ord-retrn', function(){
+        console.log('return button clickeddd....')
+        var orderproductId = $(this).data('orderproduct-id')
+        console.log('product id : ', orderproductId)
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val()
+    
+        swal({
+            title:"Are You Sure",
+            text:"Do you want to Return this product",
+            icon:'warning',
+            buttons:['Cancel', 'Yes'],
+            dangerMode:true,
+        }).then(function(confirmYes) {
+            if(confirmYes){
+                $.ajax({
+                    method:"POST",
+                    url:"/orders/order-return/",
+                    data:{
+                        'orderproduct_id':orderproductId,
+                        'csrfmiddlewaretoken':csrfToken,
+                    },
+                    success:function(response){
+                        swal({
+                            title:"Returned",
+                            text:response.message,
+                            icon:'success',
+                            timer:4000,
+                            button:false,
+                        }).then(function(){
+                            $('#user-order-det-block').load(location.href + ' #user-order-det-block')
+                        })
+                    }
+                })
+            }
+        })
+    })
 </script>
 {% endblock script %}

@@ -42,7 +42,7 @@ class Order(models.Model) :
     order_total = models.FloatField()
     GST = models.FloatField()
     sub_total = models.FloatField(null=True)
-    status = models.CharField(max_length=20 , choices=STATUS , default='New')
+    status = models.CharField(max_length=20 , choices=STATUS )
     ip = models.CharField(blank=True , max_length=20)
     is_orderd = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -65,7 +65,7 @@ class Order(models.Model) :
         if self.coupon == None:
             return self.order_total
         else:
-            return self.order_total + self.coupon.discount_amount
+            return self.order_total - self.coupon.discount_amount
     
 
     
@@ -79,7 +79,7 @@ class OrderProduct(models.Model) :
     product_price = models.FloatField()
     orderd = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
-    status = models.CharField(max_length=255, default="pending")
+    status = models.CharField(max_length=255, default="Order Placed")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -1,5 +1,3 @@
-
-
 {% extends 'admin-temp/base.html' %}
 {% load static %}
 {% block content %}
@@ -7,351 +5,55 @@
 <section class="content-main">
     <div class="content-header">
         <div>
-            <h2 class="content-title card-title">Order List </h2> 
+            <h2 class="content-title card-title">Order List </h2>
+            
         </div>
-        {% comment %} <div>
-            <input type="text" placeholder="Search order ID" class="form-control bg-white">
-        </div> {% endcomment %}
     </div>
     <div class="card mb-4">
-        {% comment %} <header class="card-header">
-            <div class="row gx-3">
-                <div class="col-lg-4 col-md-6 me-auto">
-                    <input type="text" placeholder="Search..." class="form-control">
-                </div> 
-                <div class="col-lg-2 col-6 col-md-3">
-                    <select class="form-select">
-                        <option>Status</option>
-                        <option>Active</option>
-                        <option>Disabled</option>
-                        <option>Show all</option>
-                    </select>
-                </div> 
-                 <div class="col-lg-2 col-6 col-md-3">
-                    <select class="form-select">
-                        <option>Show 20</option>
-                        <option>Show 30</option>
-                        <option>Show 40</option>
-                    </select>
-                </div> 
-            </div>
-        </header> <!-- card-header end// --> {% endcomment %}
+        
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover" id="orderTable">
+                <table class="table table-hover" id='ordersListTable'>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Total</th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Status</th>               
-                            <th scope="col" class="text-end"> Action </th>
-                            <th></th>
-                            <th></th>
+                            <th class="text-center">#Order Number</th>
+                            <th scope="col" class="text-center">Ordered Account</th>
+                            <th scope="col" class="text-center">Billing Name</th>
+                            <th scope="col" class="text-center">Address</th>
+                            <th scope="col" class="text-center">Order Date</th>
+                            <th scope="col" class="text-center"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in orders %}
+                        {% for order in orders %}
                         <tr>
-                            <td>{{i.id}}</td>
-                            <td><b>{{i.user.first_name}} {{i.user.last_name}}</b></td>
-                            <td><template class="__cf_email__" data-cfemail="aec3cfdcd8c7c0eecbd6cfc3dec2cb80cdc1c3">[email&#160;protected]</template>{{i.user}}</td>
-                            <td>₹ {{i.order_total}}</td>
-                            <td>{{i.created_at}}</td>
-                            <td><span class="badge rounded-pill alert-warning">{{i.status}}</span></td>
-                            
-                            <td>
-                                <form method="POST" action="{% url 'edit_order' i.id %}">
-                                    {% csrf_token %}
-                                    <select name="status">
-                                        <option value="New" class="dropdown-item" {% if i.status == 'Pending' %}selected{% endif %}>Pending</option>
-                                        <option value="Pending" {% if i.status == 'Shipped' %}selected{% endif %}>Shipped</option>
-                                        <option value="Confirmed" {% if i.status == 'Delivered' %}selected{% endif %}>Delivered</option>
-                                        <option value="out for shipping" {% if i.status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
-                                        <option value="Delivered" {% if i.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
-                                        <option value="Cancelled" {% if i.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
-                  
-                                    </select>
-                                    <td><button class="btn btn-md rounded font-sm" type="submit">Change</button></td>
-                                </form>
-                            </td>
-                            <td class="text-end">
-                                <a href="{% url 'order_details' i.id %}" class="btn btn-md rounded font-sm">Detail</a>
+                            <td class="text-center">{{order.order_number}}</td>
+                            <td class="text-center">{{order.user}}</td>
+                            <td class="text-center"><b>{{order.address.full_name}}</b></td>
+                            <td class="text-center">{{order.address.full_address}}</td>
+                            {% comment %} <td class="text-center">₹{{order.order_total}}</td> {% endcomment %}
+                            {% comment %} <td class="text-center"><span class="badge rounded-pill alert-warning">{{order.status}}</span></td> {% endcomment %}
+                            <td class="text-center">{{order.created_at}}</td>
+                            <td class="text-center">
+                                <a href="{% url 'order_details' order.id %}" class="btn btn-md rounded font-sm">Detail</a> 
                             </td>
                         </tr>
                         {% endfor %}
-                        {% comment %} <tr>
-                            <td>2323</td>
-                            <td><b>Leslie Alexander</b></td>
-                            <td><template class="__cf_email__" data-cfemail="b7dbd2c4dbded2f7d2cfd6dac7dbd299d4d8da">[email&#160;protected]</template></td>
-                            <td>$46.61</td>
-                            <td><span class="badge rounded-pill alert-warning">Pending</span></td>
-                            <td>21.02.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>1233</td>
-                            <td><b>Esther Howard</b></td>
-                            <td><template class="__cf_email__" data-cfemail="86e3f5f2eee3f4c6e3fee7ebf6eae3a8e5e9eb">[email&#160;protected]</template></td>
-                            <td>$12.00</td>
-                            <td><span class="badge rounded-pill alert-danger">Canceled</span></td>
-                            <td>03.07.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>1233</td>
-                            <td><b>Esther Howard</b></td>
-                            <td><template class="__cf_email__" data-cfemail="9ffaecebf7faeddffae7fef2eff3fab1fcf0f2">[email&#160;protected]</template></td>
-                            <td>$12.00</td>
-                            <td><span class="badge rounded-pill alert-danger">Canceled</span></td>
-                            <td>03.07.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2323</td>
-                            <td><b>Jenny Wilson</b></td>
-                            <td><template class="__cf_email__" data-cfemail="b8d2ddd6d6c1f8ddc0d9d5c8d4dd96dbd7d5">[email&#160;protected]</template></td>
-                            <td>$589.99</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>22.05.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2112</td>
-                            <td><b>Marvin McKinney</b></td>
-                            <td><template class="__cf_email__" data-cfemail="c9a4a8bbbfa0a789acb1a8a4b9a5ace7aaa6a4">[email&#160;protected]</template></td>
-                            <td>$16.58</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>23.04.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>7897</td>
-                            <td><b>Albert Flores</b></td>
-                            <td><template class="__cf_email__" data-cfemail="81e0ede3e4f3f5c1e4f9e0ecf1ede4afe2eeec">[email&#160;protected]</template></td>
-                            <td>$10.00</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>13.03.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2323</td>
-                            <td><b>Wade Warren</b></td>
-                            <td><template class="__cf_email__" data-cfemail="334452575673564b525e435f561d505c5e">[email&#160;protected]</template></td>
-                            <td>$105.55</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>23.09.2019</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2324</td>
-                            <td><b>Jane Cooper</b></td>
-                            <td><template class="__cf_email__" data-cfemail="7218131c1732170a131f021e175c111d1f">[email&#160;protected]</template></td>
-                            <td>$710.68</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>28.04.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2325</td>
-                            <td><b>Savannah Nguyen</b></td>
-                            <td><template class="__cf_email__" data-cfemail="67140611060909060f27021f060a170b024904080a">[email&#160;protected]</template></td>
-                            <td>$710.68</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>23.03.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2326</td>
-                            <td><b>Guy Hawkins</b></td>
-                            <td><template class="__cf_email__" data-cfemail="abccded2ebced3cac6dbc7ce85c8c4c6">[email&#160;protected]</template></td>
-                            <td>$767.50</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>28.04.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2327</td>
-                            <td><b>Darrell Steward</b></td>
-                            <td><template class="__cf_email__" data-cfemail="9df9fcefeff8f1ddf8e5fcf0edf1f8b3fef2f0">[email&#160;protected]</template></td>
-                            <td>$406.27</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>14.07.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2328</td>
-                            <td><b>Jane Cooper</b></td>
-                            <td><template class="__cf_email__" data-cfemail="690308070c290c11080419050c470a0604">[email&#160;protected]</template></td>
-                            <td>$601.13</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>18.03.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                            <td>2329</td>
-                            <td><b>Darlene Robertson</b></td>
-                            <td><template class="__cf_email__" data-cfemail="244041564d414a4164415c45495448410a474b49">[email&#160;protected]</template></td>
-                            <td>$948.55</td>
-                            <td><span class="badge rounded-pill alert-success">Received</span></td>
-                            <td>03.07.2020</td>
-                            <td class="text-end">
-                                <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                <div class="dropdown">
-                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">View detail</a>
-                                        <a class="dropdown-item" href="#">Edit info</a>
-                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                    </div>
-                                </div> <!-- dropdown //end -->
-                            </td>
-                        </tr> {% endcomment %}
                     </tbody>
                 </table>
             </div> <!-- table-responsive //end -->
         </div> <!-- card-body end// -->
     </div> <!-- card end// -->
-    {% comment %} <div class="pagination-area mt-15 mb-50">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-start">
-                <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                <li class="page-item"><a class="page-link" href="#">02</a></li>
-                <li class="page-item"><a class="page-link" href="#">03</a></li>
-                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                <li class="page-item"><a class="page-link" href="#">16</a></li>
-                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-            </ul>
-        </nav>
-    </div> {% endcomment %}
-</section>
+</section> <!-- content-main end// -->
 
-{% endblock %}
+
+
+{% endblock content %}
+
 {% block script %}
+
 <script>
-    $('#orderTable').DataTable({
+    $('#ordersListTable').DataTable({
         paging:true,
         pageLength:10,
         lengthChange:true,
@@ -361,5 +63,5 @@
         bSort:false,
     })
 </script>
-{% endblock script %}
 
+{% endblock script %}

@@ -7,7 +7,6 @@
     <div class="col-md-6 mt-3">
         <form method='post' enctype="multipart/form-data">
             {% csrf_token %}
-            {% comment %} {{ form.as_p }} {% endcomment %}
             <div class="mb-4">
                 <h3 style="text-align: center;">Catagory Add</h3>
             </div> 
@@ -15,28 +14,19 @@
                 <label for="catagory_name" class="form-label">Name</label>
                  <input type="text" placeholder="Type here" class="form-control"
                  id="catagory_name" name="catagory_name"   /> 
-                    {% comment %} {{ form.catagory_name }} {% endcomment %}
             </div>
             <div class="mb-4">
                 <label for="catagory_slug" class="form-label">Slug</label>
                  <input type="text" placeholder="Type here" class="form-control"
                     name="catagory_slug" /> 
-                    {% comment %} {{ form.slug }} {% endcomment %}
             </div>
-            {% comment %} <div class="mb-4">
-                <label class="form-label">Category</label>
-                <input type="text" placeholder="Type here" class="form-control"
-                    id="product_category" />
-            </div>  {% endcomment %}
             <div class="mb-4">
                 <label class="form-label">Description</label>
                <textarea placeholder="Type here" class="form-control" name='catagory_description'></textarea> 
-                {% comment %} {{ form.description }} {% endcomment %}
             </div>
             <div class="mb-4">
                 <label for="catagory_image" class="form-label">Image</label>
                  <input type="file" id="catagory_image" name="catagory_image" accept="image/*" class="form-control" /> 
-                {% comment %} {{ form.cat_image }} {% endcomment %}
             </div> 
             <div class="d-grid">
                 <button type='submit' class="btn btn-primary">Create category</button>

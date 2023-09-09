@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from Catagory.models import Catagory
-from accounts.models import Account
+from accounts.models import Account,Wallet
 from django.contrib import messages
 from store.models import Product,Picture
 from .forms import ProductForm,ProductImageForm,SearchForm
@@ -12,12 +12,14 @@ from django.http import JsonResponse
 from orders.models import OrderProduct
 import calendar
 from orders.models import Order
-from django.db.models import Count,Q
+from django.db.models import Count,Q,Sum
 from django.db.models.functions import ExtractMonth,ExtractYear
 from offer.models import Coupon
 from offer.forms import CouponForm
 from django.utils import timezone
 from datetime import timedelta,datetime,date
+from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.http import require_GET
 
 
 
@@ -43,7 +45,8 @@ def my_admin_view(request) :
     if request.user.is_superuser:
         user_count = Account.objects.filter(is_superuser=False).count()
         delivered_products = OrderProduct.objects.all().filter(status='Delivered')
-        revenue = sum(product.total() for product in delivered_products)
+        print("delivered_products :",delivered_products)
+        revenue = delivered_products.aggregate(Sum('order__order_total'))['order__order_total__sum'] or 0
         print('revenue:',revenue)
         total_orders = OrderProduct.objects.all().count()
         status_counts = OrderProduct.objects.values('status').annotate(count=Count('status'))
@@ -80,8 +83,11 @@ def my_admin_view(request) :
                 if order.order.updated_at.date() == first_date:
                     total_amount_per_day += order.total()
             amount_per_day.append(total_amount_per_day)
+            print("amount_per_day :",amount_per_day)
             date_list.append(first_date)
+            print("date_list :",date_list)
             first_date = first_date + timedelta(days=1)
+            print("first_date :",first_date)
     
   
         context = {
@@ -102,61 +108,7 @@ def my_admin_view(request) :
         }
         return render(request,'admin-temp/index.html', context)
     return redirect('admin_signin')
-    # delivered_orders = Order.objects.filter(status='Delivered')
-    # print(delivered_orders)
-    # delivered_orders_by_months = delivered_orders.annotate(delivered_month=ExtractMonth('created_at')).values('delivered_month').annotate(delivered_count=Count('id')).values('delivered_month', 'delivered_count')
-    # print( "delivered_orders_by_months")
-    # print( delivered_orders_by_months)
-    # delivered_orders_month = []
-    # delivered_orders_number = []
-    # for d in delivered_orders_by_months:
-    #      delivered_orders_month.append(calendar.month_name[d['delivered_month']])
-    #      delivered_orders_number.append(list(d.values())[1])
-
-    # order_by_months = Order.objects.annotate(month=ExtractMonth('created_at')).values('month').annotate(count=Count('id')).values('month', 'count')
-    # monthNumber = []
-    # totalOrders = []
-
-    # for o in order_by_months:
-    #     monthNumber.append(calendar.month_name[o['month']])
-    #     totalOrders.append(list(o.values())[1])
-        
-    # order_by_year = Order.objects.annotate(year=ExtractYear('created_at')).values('year').annotate(count=Count('id')).values('year', 'count')
-
-    # yearNumber = []
-    # total_Orders = []
-
-    # for o in order_by_year:
-    #     yearNumber.append(o['year'])
-    #     total_Orders.append(o['count'])    
-
-    # print(yearNumber)
-    # print(1)
     
-    # print(delivered_orders)
-    
-    # print(total_Orders)
-    # print(order_by_months)
-    # print(2)
-    
-    # print(delivered_orders_number)
-    # print(delivered_orders_month)
-    # print(delivered_orders_by_months)
-    # context = {
-    #     'monthNumber': monthNumber,
-    #     'totalOrders': totalOrders,
-    #     'yearNumber': yearNumber,
-    #     'total_Orders': total_Orders,
-    #     'delivered_orders':delivered_orders,
-    #     'order_by_months':order_by_months,
-        
-    #     'totalOrders':totalOrders,
-    #     'delivered_orders_number':delivered_orders_number,
-    #     'delivered_orders_month':delivered_orders_month,
-    #     'delivered_orders_by_months':delivered_orders_by_months,
-
-    # }
-    # return render(request, "admin-temp/index.html",context)
 
 @login_required(login_url='admin_signin')
 @never_cache
@@ -173,20 +125,6 @@ def users_list(request) :
         'users' : users
     }
     return render(request, 'admin-temp/users-list.html' , context)
-
-# def block_user(request,id):
-#     if request.user.is_superadmin:
-#         user = Account.objects.get(pk=id)
-#         if user.is_blocked:
-#             user.is_blocked=False
-#             user.save()
-#             return redirect('users-list')
-#         else:
-#             user.is_blocked = True
-#             user.save()
-#             return redirect('users-list')
-#     return redirect('users-list')
-
 
 # product side
 
@@ -249,11 +187,34 @@ def update_product(request,id):
     
         return render(request, 'admin-temp/update-product.html', {'form': form, 'image_form':image_form})
 
+@login_required(login_url='admin_signin')
 @never_cache
-@login_required(login_url='user_login')
-def delete_product(request, id):
-    get_object_or_404(Product, id=id).delete()
-    return redirect('product_listt')
+def del_product(request,product_id):
+    product_id = request.POST.get('product_id')
+    try:
+        product = Product.objects.get(id=product_id)
+    except ObjectDoesNotExist:
+        return JsonResponse({'message': 'Product does not exist...'}, status=404)
+    if request.method == 'POST':
+        product.delete()
+        return JsonResponse({'message': 'Product successfully deleted...'})
+    else:
+        pass
+
+@login_required(login_url='admin_signin')
+@never_cache
+def deact_product(request):
+    product_id = request.POST.get('product_id')
+    product = Product.objects.get(id=product_id)
+    if product.is_available:
+        product.is_available = False
+        product.save()
+        return JsonResponse({'title':'Deactivated','message':'Product deactivated...',})
+    else:
+        product.is_available = True
+        product.save()
+        return JsonResponse({'title':'Activated','message':'Product Activated...',})    
+
 
 def search(request) :
     search_query = request.GET.get('search_query', '')
@@ -288,12 +249,34 @@ def block_user(request,id):
             user.save()
             return JsonResponse({'title':'Blocked','text':'User is Blocked'})
         
-def change_status(request, orderproduct_id, new_status):
-    order_product = get_object_or_404(OrderProduct, id=orderproduct_id)
-    order_product.status = new_status
-    order_product.save()
-    
-    return JsonResponse({'message': 'Status changed successfully'})  
+
+@login_required(login_url='admin_signin')
+@never_cache
+def change_status(request):
+    if request.method == "GET":
+        orderproduct_id = request.GET['orderproduct_id']
+        status = request.GET['status']
+        
+        orderproduct = OrderProduct.objects.get(id=orderproduct_id)
+        if orderproduct.status == 'Return Requested' and status == 'Returned':
+            product = orderproduct
+            order = orderproduct.order
+            order.order_total -= orderproduct.order.order_total
+            orderproduct.status = 'Returned'
+
+            wallet = Wallet.objects.get(user_id=orderproduct.order.user.id)
+            wallet.balance += orderproduct.order.order_total
+            wallet.save()
+            
+            product.quantity += orderproduct.quantity
+            product.save()
+            order.save()
+            status = 'Returned'
+
+        print('status : ', status)
+        orderproduct.status = status
+        orderproduct.save()
+        return JsonResponse({'message':'Status has been changed..'})  
 
 def sales_report(request) :
     if request.user.is_superuser:

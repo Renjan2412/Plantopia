@@ -109,112 +109,137 @@
 <script>
     if ($('#myChart').length) {
         var ctx = document.getElementById('myChart').getContext('2d');
-        var chart = new Chart(ctx, {
-            // The type of chart we want to create
-            type: 'line',
-            
-            // The data for our dataset
-            data: {
-                labels: [{% for date in date_list %} '{{date}}', {% endfor %}],
-                datasets: [{
-                        label: 'Weekly Sales',
-                        tension: 0.3,
-                        fill: true,
-                        backgroundColor: 'rgba(44, 120, 220, 0.2)',
-                        borderColor: 'rgba(44, 120, 220)',
-                        data: [{% for amount in amount_per_day %} '{{amount}}', {% endfor %}]
-                    },
-                    
+        var existingChart = Chart.getChart(ctx);
 
-                ]
-            },
-            options: {
-                plugins: {
+        // Destroy the existing chart if it exists
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        var chartData = {
+            labels: [{% for date in date_list %} '{{ date }}', {% endfor %}],
+            datasets: [{
+                label: 'Weekly Sales',
+                tension: 0.3,
+                fill: true,
+                backgroundColor: 'rgba(44, 120, 220, 0.2)',
+                borderColor: 'rgba(44, 120, 220)',
+                data: [{% for amount in amount_per_day %} '{{ amount }}', {% endfor %}]
+            }]
+        };
+        
+        var chartOptions = {
+            plugins: {
                 legend: {
                     labels: {
-                    usePointStyle: true,
+                        usePointStyle: true,
                     },
                 }
-                }
             }
+        };
+
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: chartOptions
         });
     }
 
 
     if ($('#myChart2').length) {
         var ctx = document.getElementById("myChart2");
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-            labels: [{% for date in neworders %} '{{date.order__updated_at__date}}', {% endfor %}],
+        var existingChart = Chart.getChart(ctx);
+
+        // Destroy the existing chart if it exists
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        var chartData = {
+            labels: [{% for date in neworders %} '{{ date.order__updated_at__date }}', {% endfor %}],
             datasets: [
                 {
                     label: "New orders",
                     backgroundColor: "#5897fb",
-                    barThickness:10,
-                    data: [{% for order in neworders %} '{{order.orderitemscount}}', {% endfor %}]
+                    barThickness: 10,
+                    data: [{% for order in neworders %} '{{ order.orderitemscount }}', {% endfor %}]
                 }, 
                 {
                     label: "Cancelled",
                     backgroundColor: "#7bcf86",
-                    barThickness:10,
-                    data: [{% for order in cancelledorders %} '{{order.cancelleditemscount}}', {% endfor %}]
+                    barThickness: 10,
+                    data: [{% for order in cancelledorders %} '{{ order.cancelleditemscount }}', {% endfor %}]
                 },
                 {
                     label: "Returned",
                     backgroundColor: "#ff9076",
-                    barThickness:10,
-                    data: [{% for order in returnorders %} '{{order.returnedorderscount}}', {% endfor %}]
+                    barThickness: 10,
+                    data: [{% for order in returnorders %} '{{ order.returnedorderscount }}', {% endfor %}]
                 },
                 {
                     label: "Delivered",
                     backgroundColor: "#d595e5",
-                    barThickness:10,
-                    data: [{% for order in deliveredorders %} '{{order.delivereditemscount}}', {% endfor %}]
+                    barThickness: 10,
+                    data: [{% for order in deliveredorders %} '{{ order.delivereditemscount }}', {% endfor %}]
                 },
             ]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        labels: {
+        };
+        
+        var chartOptions = {
+            plugins: {
+                legend: {
+                    labels: {
                         usePointStyle: true,
-                        },
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    },
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
+        };
+
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: chartOptions
         });
-    } //end if
+    }
 
     if ($('#myChart3').length) {
         var ctx = document.getElementById("myChart3");
-        var myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
+        var existingChart = Chart.getChart(ctx);
+
+        // Destroy the existing chart if it exists
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        var chartData = {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             datasets: [
                 {
                     label: "Total sales",
                     backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850","#ff6699","#cc6600","#993366","#999966","#66ff33","#00ff99"],
-                    data: {{monthly_order_count}},
+                    data: {{ monthly_order_count|safe }},
                 }, 
-                
             ]
-            },
-            options: {
-                title: {
-                    display:true,
-                    text:''
-                }
+        };
+        
+        var chartOptions = {
+            title: {
+                display: true,
+                text: ''
             }
-            
+        };
+
+        var myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: chartData,
+            options: chartOptions
         });
-    } //end if
+    }
 
 </script>
 {% endblock script %}

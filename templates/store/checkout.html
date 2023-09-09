@@ -16,35 +16,6 @@
         </div>
     </div>
     <section class="mt-50 mb-50">
-
-        <!-- Form Modal -->
-            {% comment %} <div class="modal fade" id="newAddressModal" tabindex="-1" role="dialog" aria-labelledby="newAddressModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="newAddressModalLabel">New Address</h5>
-                            <button type="button" class="close" aria-label="Close" onclick="closeModal()">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-
-                        </div>
-                        <div class="modal-body">
-                            <form id="check-address-form">
-                                {% csrf_token %}
-                                <input type='hidden' name='addr_id' id='addr_id_input' value=''>
-                                <!-- Form fields -->
-                                {{form.as_p}}
-                                 <!-- Add more form fields here as needed -->
-
-                                <!-- Submit button -->
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div> {% endcomment %}
-         
-
         <div class="container">
             <form action="" method='POST' id='form-sub'>
                 {% csrf_token %}
@@ -66,7 +37,6 @@
                             
                             <div class="card-header">
                                 <div class="custom-radio">
-                                    {% comment %} <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" checked=""> {% endcomment %}
                                     <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#checkPayment" aria-controls="checkPayment">Billing Adrress</label>
                                     
                                 </div>
@@ -91,28 +61,15 @@
                                           ,<br>
                                          City :{{ addr.city }}, <br>
                                         State :{{addr.state}} <br> Pin :{{addr.post_code}} <br>
-                                        Phone No :{{addr.phone_number}}
-                                        
+                                        Phone No :{{addr.phone_number}}                                      
                                         </p>
-                                        {% comment %} <a href="{% url 'payment_page' i.id  %}" class="btn btn-primary">Deliver here</a> {% endcomment %}
-                                        {% comment %} <a href="{% url 'delete_address' i.id %}" class="btn btn-primary">Remove</a> {% endcomment %}
-                                    </td>
-                                    
+                                    </td>                                 
                                     </tr> 
-                                    {% endfor %}
-                                    
-                                </tbody>
-                             
+                                    {% endfor %}                                 
+                                </tbody>                           
                             </div>
-                          </div>
-                          
-                          
-                        
-                        
-                        
+                          </div>    
                          </div>      
-                    
-                    
                         <div class="col-md-6">
                             <div class="order_review">
                                 <div class="mb-20">
@@ -154,16 +111,10 @@
                                                 <td colspan="2" class="product-subtotal" >
                                                 <span   class="font-xl text-brand fw-900">₹{{ coupon_discount }}</span>
                                                 <span  hidden id="coupon_discount" class="font-xl text-brand fw-900">{{ coupon_discount }}</span>
-                                                
+                                                <span id="coupon-id" data-coupon-id="{{ coupon_id }}"></span>                                                
                                             </td>
                                             </tr> 
                                             {% endif %}
-                                            {% comment %} <tr id="coupon-row">
-                                                <td class="cart_total_label">Coupon Discount</td>
-                                                <td class="cart_total_amount font-lg fw-500 text-brand" id="discount-amount">
-                                                    <span id="coupon-discount" style="display: none;">{{ coupon_discount|default:0 }}</span>
-                                                </td>
-                                            </tr> {% endcomment %}
                                             <tr>
                                                 <th>Total</th>
                                                 <td colspan="2" class="product-subtotal" >
@@ -193,16 +144,11 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            
-                            {% comment %} <button type="submit" name="submit" class="btn btn-fill-out btn-block mt-30">Place Order</button> {% endcomment %}
                             <button id="placeOrder" value="{{cart}}" type="button"
                             class="btn btn-outline-primary-2 btn-order btn-block">
 
                             <span class="btn-text">Place Order</span>
-                            <span class="btn-hover-text">Proceed</span>
-                        </button> 
-                        {% comment %} <a href="{% url 'payments' %}" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a> {% endcomment %}
+                        </button>
                         </div>
                     </div>
                 </div>
@@ -217,15 +163,6 @@
 <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-   // $(document).ready(function() {
-        // Add event listener to payment option radio buttons
-        //$('.payment_option_radio').on('change', function() {
-           // let selectedPaymentOption = $('input[name="payment_option"]:checked').val();
-           // console.log('Selected Payment Option:', selectedPaymentOption);
-        //});
-
-    
-
         $('#placeOrder').on('click', function (e) {
             e.preventDefault()
             console.log('place order clickedd....')
@@ -253,62 +190,72 @@
 
             let grandTotal = parseFloat(grandPriceText);
             console.log(grandTotal);
+            console.log('grandTotal Element:', grandTotal);
         
             let paymentmethod = $('input[name="payment_option"]:checked').val();
             console.log(paymentmethod);
+
+            const couponID = $('#coupon-id').data('coupon-id');
+            console.log("couponID" + couponID)
+            if (couponID !== undefined && couponID !== null && couponID !== "") {
+                console.log('Coupon ID:', couponID);
+
+             
         
-            if (paymentmethod === "Razor Pay") {    //razorpay method
-                console.log("Razorpay");
-                const data = {
-                    addressID: addressID,
-                    subTotal : subTotal,
-                    GST : gst,
-                    grandPriceText: grandTotal,
-                    paymentmethod: paymentmethod,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                };
-                
-                $.ajax({
-                    url: "/orders/order/",
-                    method: 'POST',
-                    data: data,
-                    success: function(response) {
-                        console.log("razorpay started")
-                         razorpay(response);
-                        var coupon_discount = response.response.coupon_discount;
-                         
-                    }
-                });
-                console.log(response)
-    
-            } else {  //cod method
-                const data = {
-                    addressID: addressID,
-                    subTotal : subTotal,
-                    GST : gst,
-                    grandPriceText: grandPriceText,
-                    paymentmethod: paymentmethod,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                };
+                if (paymentmethod === "Razor Pay") {    //razorpay method
+                    console.log("Razorpay");
+                    const data = {
+                        addressID: addressID,
+                        subTotal : subTotal,
+                        GST : gst,
+                        grandPriceText: grandTotal,
+                        paymentmethod: paymentmethod,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        coupon_id: couponID,
+                    };
+                    
+                    $.ajax({
+                        url: "/orders/order/",
+                        method: 'POST',
+                        data: data,
+                        success: function(response) {
+                            console.log("razorpay started")
+                            razorpay(response);
+                            var coupon_discount = response.response.coupon_discount;
+                            
+                        }
+                    });
+                    console.log(response)
         
-                $.ajax({
-                    url: '/orders/order/',
-                    method: 'POST',
-                    data: data,
-                    success: function(response) {
-                        console.log(response);
-                        console.log("code run success");
-                        var coupon_discount = response.response.coupon_discount;
-                        console.log(response.response.orders_id);
-                        window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id + '&coupon_discount=' + coupon_discount;
-                        //window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id + '&subtotal=' + subTotal + '&GST=' + GST + '&grand_total=' + grandTotal;
-                        
-                        
-                    }
-                });
-            }
+                } else {  //cod method
+                    const data = {
+                        addressID: addressID,
+                        subTotal : subTotal,
+                        GST : gst,
+                        grandPriceText: grandPriceText,
+                        paymentmethod: paymentmethod,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        coupon_id: couponID,
+                    };
+            
+                    $.ajax({
+                        url: '/orders/order/',
+                        method: 'POST',
+                        data: data,
+                        success: function(response) {
+                            console.log(response);
+                            console.log("code run success");
+                            var coupon_discount = response.response.coupon_discount;
+                            console.log(response.response.orders_id);
+                            window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id + '&coupon_discount=' + coupon_discount;
+                            //window.location.href = '{% url 'order_success' %}?order_id=' + response.response.order_id + '&orders=' + response.response.orders_id + '&subtotal=' + subTotal + '&GST=' + GST + '&grand_total=' + grandTotal;
+                            
+                            
+                        }
+                    });
+                }
          
-    
+            }
             //razorpay function
             function razorpay(response) {
                
@@ -345,28 +292,10 @@
                 rzp1.open();
             }
         });
+        
     
 
 </script>
-<script>
-    $(document).ready(function() {
-        // ... Other code ...
-
-        // Update the coupon discount element with the value
-        const couponDiscount = parseFloat($('#coupon-discount').text());
-        if (!isNaN(couponDiscount) && couponDiscount > 0) {
-            $('#coupon-row').show();
-            $('#discount-amount').text(`- ₹${couponDiscount}`);
-        }
-        console.log('couponDiscount :',couponDiscount)
-
-        // ... Rest of your script ...
-    });
-</script>
-
-
-
-
 {% endblock script %}
 
 

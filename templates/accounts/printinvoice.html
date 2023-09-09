@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+    <html lang="en">
+    {% load static %}
+    <head>
+    <title>Invoice Dolofitness</title>
+    <style>
+    .clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+    }
+
+    a {
+    text-decoration: underline;
+    }
+
+    body {
+    position: relative;
+    margin: 0 auto; 
+    color: #001028;
+    background: #FFFFFF; 
+    font-family: Arial, sans-serif; 
+    font-size: 14px; 
+    font-family: Arial;
+    }
+
+    header {
+    padding: 10px 0;
+    margin-bottom: 30px;
+    }
+
+    #logo {
+    text-align: center;
+    margin-bottom: 10px;
+    }
+
+    #logo img {
+    width: 90px;
+    }
+
+    h1 {
+    
+    color: #5D6975;
+    font-size: 2.4em;
+    line-height: 1.4em;
+    font-weight: normal;
+    text-align: center;
+    margin: 0 0 20px 0;
+    }
+
+    #project {
+    float: left;
+    }
+
+    #project span {
+    color: #5D6975;
+    text-align: right;
+    width: 52px;
+    margin-right: 10px;
+    display: inline-block;
+    font-size: 14px;
+    }
+
+    #company {
+    float: right;
+    text-align: right;
+    }
+
+    #project div,
+    #company div {
+    white-space: nowrap;        
+    }
+
+    table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    }
+
+
+
+    table th,
+    table td {
+    text-align: center;
+    }
+
+    table th {
+    
+    
+    color: #5D6975;
+    border-bottom: 1px solid #C1CED9;
+    white-space: nowrap;        
+    font-weight: normal;
+    }
+
+    table .service,
+    table .desc {
+    text-align: left;
+    }
+
+    table td {
+    padding-top:5px;
+    padding-bottom:5px;
+    
+    }
+
+    table tr {
+    border-bottom: 1px solid #C1CED9;
+    }
+
+    table td.service,
+    table td.desc {
+    vertical-align: top;
+    }
+
+    table td.unit,
+    table td.qty,
+    table td.total {
+    font-size: 1.2em;
+    }
+
+    table td.grand {
+    border-top: 1px solid #5D6975;;
+    }
+
+    #notices .notice {
+    color: #5D6975;
+    font-size: 1.2em;
+    }
+
+    footer {
+    color: #5D6975;
+    width: 100%;
+    height: 30px;
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid #C1CED9;
+    padding: 8px 0;
+    text-align: center;
+    }
+
+
+    </style>
+    </head>
+
+    <header class="clearfix">
+        <div id="logo" style="display:flex; justify-content:center; align-items:center;">
+
+        <h1 class="brand-name">Plantopia</h1>
+        </div>
+        <h1>INVOICE</h1>
+        <div id="company" class="clearfix">
+        <div>Plantopia</div>
+      
+        </div>
+        <div id="project">
+            <div class="invoice-from">
+                <dl class="list-unstyled">
+                    <dt><strong>Invoiced To</strong></dt    >
+                    <dt>{{item.order.address.full_name}}</dt>
+                    <dt>{{item.order.address.full_address}}</dt>
+                    <dt>{{item.order.address.city}}, {{item.order.address.state}}</dt>
+                    <dt>{{item.order.address.country}}</dt>
+                    <dt>{{item.order.address.post_code}}</dt>
+                </dl>
+            </div>
+            <div class="invoice-details mt25">
+                <div class="well">
+                    <ul class="list-unstyled mb0">
+                        <li><strong>Order</strong> #{{item.order.order_number}}</li>
+                        <li><strong>Order Date:</strong> {{item.order.created_at}}</li>
+                        <li><strong>Status:</strong> Completed</li>
+                    </ul>
+                </div>
+            </div>
+        <br>
+        <br>
+    </header>
+        <div class="table-container" style="overflow-x:auto">
+        <table class="table" style="width:100%">
+            <thead>
+                <tr>
+                    <th scope="col">Products</th>
+                    <th scope="col">Qty</th>
+                    <th scope="col">Unit Price</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                                          
+                <tr>
+                    <td>{{item.product.product_name}}</td>
+                    <td class="">{{item.quantity}}</td>
+                    
+                    <td class="">Rs.{{item.product_price}}</td>
+                    <td class="">Rs.{{item.total}}</td>
+                </tr>
+              
+            </tbody>
+            <tfoot>
+                <br>
+                <tr>
+                    <th colspan="3" class="text-right">Sub Total:</th>
+                    <th class="text-center">Rs.{{item.total}}</th>
+                </tr>
+                <br>
+                <tr>
+                    <th colspan="3" class="text-right">GST:</th>
+                    <th class="text-center">Rs.{{item.order.GST}}</th>
+                </tr>
+                <br>
+                {% if discount != 0 %}
+                <tr>
+                    <th colspan="3" class="text-right">Coupon discount</th>
+                    <th class="text-center">₹{{discount}}</th>
+                </tr>
+                {% endif %} 
+                <br>
+                <tr>
+                    <th colspan="3" class="text-right">Grand Total:</th>
+                    <th class="text-center">Rs.{{item.order.order_total}}</th>
+                </tr>
+            </tfoot>
+        </table>
+
+        </div>
+        <p style="text-align:right; font-size:12px;">*All values are in INR<p>
+    </body>
+
+    </html>

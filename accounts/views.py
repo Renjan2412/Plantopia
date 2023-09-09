@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from .forms import RegistrationForm,UserForm,UserProfileForm
-from .models import Account , UserProfile,Wallet
+from .models import Account , UserProfile,Wallet,UserProfileImage
 from django.contrib import messages,auth
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
@@ -22,6 +22,13 @@ from store .models import Wishlist
 from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
+
+#download invoice
+
+from io import BytesIO
+from xhtml2pdf import pisa
+from django.views.generic import View
+from django.template.loader import get_template
 
 # Create your views here.
 
@@ -172,12 +179,12 @@ def logout(request) :
 @login_required(login_url = 'user_login')
 def dashboard(request) :
     orders = Order.objects.order_by('-updated_at').filter(user_id=request.user.id)
-    userprofile = UserProfile.objects.filter(user=request.user)    
+    userprofile = UserProfileImage.objects.get(user=request.user)    
     order_count = orders.count()
     try :
         wallet_amount = Wallet.objects.get(user_id = request.user.id).balance
     except ObjectDoesNotExist:
-            wallet_amount = None
+            wallet_amount = 0.00
     context = {       
         'order_count':order_count,
         'user_profile':userprofile,
@@ -217,29 +224,34 @@ def resetPassword_validate(request) :
 
 @login_required
 def edit_profile(request) :
-    try:
-        user_profile = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        user_profile = None
-    if request.method == "POST" :
-        user_form = UserForm(request.POST,instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-
-        if user_form.is_valid() and profile_form.is_valid() :
-            user_form.save()
-            profile_form.save()
-            messages.success(request,'Your Profile Has Been Updated')
-            return redirect('edit_profile')
-    else :
-        user = request.user
-        userprofile = get_object_or_404(UserProfile, user=user)
-        user_form = UserForm(instance=request.user)
-        profile_form = UserProfileForm(instance=userprofile)
+    user_profile, created = UserProfileImage.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        # userprofileimage = UserProfileImage.objects.get(user=request.user)
+        form = UserProfileForm(request.POST,request.FILES,instance=user_profile)
+        userform = UserForm(request.POST, instance=request.user)
+        
+        if form.is_valid() and userform.is_valid():
+            form.save()
+            userform.save()
+            response_data = {
+                'first_name':user_profile.first_name,
+                'last_name':user_profile.last_name,
+                # 'profile_pic':userprofileimage.profile_pic.url,
+            }
+            return JsonResponse(response_data)
+        else:
+            print('form is not valid')
+            print(form.errors)
+            print(userform.errors)
+    userform = UserForm(instance=request.user)
+    user_profile = UserProfileImage.objects.get(user=request.user)   
+    userprofileform = UserProfileForm(instance=user_profile)
+    
     context = {
-        'userprofile' : userprofile,
-        'user_form' : user_form,
-        'profile_form' : profile_form,
-    }    
+        'userprofileform':userprofileform,
+        'user_profile':user_profile,
+        'userform':userform,
+    }
     return render(request,'accounts/edit_profile.html',context)
 
 
@@ -303,6 +315,24 @@ def my_address(request):
         'addresses':addresses,
     }
     return render(request,'accounts/my_address.html',context)
+
+@login_required
+def add_address(request):
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.save()
+            address.user.add(request.user)
+            
+            return redirect('checkout')  
+    else:
+        form = AddressForm()
+    
+    # Retrieve all addresses associated with the current user
+    user_addresses = Address.objects.filter(user=request.user)
+
+    return render(request, 'accounts/add_address.html', {'form': form, 'user_addresses': user_addresses}) 
     
 @login_required(login_url='user_login')
 def del_addr(request,address_id):
@@ -316,5 +346,40 @@ def del_addr(request,address_id):
 
 
 
-def invoice(request) :
-    return render(request,'accounts/invoice.html')
+def invoice(request, order_item_id):
+    print('orderitem id : ', order_item_id)
+    ordered_product = OrderProduct.objects.get(id=order_item_id, order__user=request.user)
+    print("ordered_product:",ordered_product)
+    context = {
+        'item':ordered_product,
+        'discount':0,
+    }
+    return render(request,'accounts/invoice.html',context)
+
+
+
+
+class generateInvoice(View):
+
+    def get(self, request, orderitem_id, *args, **kwargs):
+        try:
+            orderproduct = OrderProduct.objects.get(id=orderitem_id)
+        except:
+            return HttpResponse('505 not found')
+        context = {
+            'item':orderproduct,
+            'discount':0,
+        }
+        
+        pdf = render_to_pdf('accounts/printinvoice.html',context)
+        return HttpResponse(pdf, content_type='application/pdf')
+    
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+

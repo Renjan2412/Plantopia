@@ -14,70 +14,13 @@ from offer.models import Coupon
 
 def payments(request) :
     return render(request, 'orders/payments.html')
-
-# def place_order(request, total=0, quantity=0):
-#     current_user = request.user
-
-#     cart_items = CartItem.objects.filter(user=current_user)
-#     cart_count = cart_items.count()
-
-#     if cart_count <= 0:
-#         return redirect('store')
-
-#     grand_total = 0
-#     GST = 0
-#     for cart_item in cart_items:
-#         total += (cart_item.product.price * cart_item.quantity)
-#         quantity += cart_item.quantity
-
-#     GST = (5 * total) / 100
-#     grand_total = total + GST
-
-#     if request.method == 'POST':
-#         form = OrderForm(request.POST)
-#         if form.is_valid():
-#             order = form.save(commit=False)  # Create Order instance from form data
-#             order.user = current_user
-#             order.order_total = grand_total
-#             order.GST = GST
-#             order.ip = request.META.get('REMOTE_ADDR')
-#             order.save()
-
-#             # Generate order number
-#             yr = int(datetime.date.today().strftime('%Y'))
-#             dt = int(datetime.date.today().strftime('%d'))
-#             mt = int(datetime.date.today().strftime('%m'))
-
-#             d = datetime.date(yr, mt, dt)
-#             current_date = d.strftime('%Y%mt%d')
-#             order_number = current_date + str(order.id)
-#             order.order_number = order_number
-#             order.save()
-
-#             order = Order.objects.get(user=current_user, is_orderd=False, order_number=order_number)
-#             context = {
-#                 'order' : order,
-#                 'cart_items' : cart_items,
-#                 'total' : total,
-#                 'GST' : GST,
-#                 'grand_total' : grand_total,
-#                 }
-
-#             return render(request, 'orders/payments.html' , context)
-#         else:
-#             print(form.errors)
-#             return HttpResponse('Invalid form data')
-#     else:
-#         return redirect('checkout')
-    
-
-
     
 #ajax method to create order
 def order(request):
     
     if request.method == 'POST':
         print('hiiiiiiiiiiii')
+        print('request.post : ',request.POST)
         coupon_discount = 0
         payment_method = request.POST.get('paymentmethod')
         coupon_id = request.POST.get('coupon_id')
@@ -147,7 +90,7 @@ def order(request):
                 payment=payment,
                 address=address,
                 order_total=grand_total,
-                status="Pending",
+                status="Order Placed",
                 order_number=order_number,
                 GST=GST,
                 sub_total=sub_total,
@@ -224,7 +167,7 @@ def order(request):
                 payment=payment,
                 address=address,
                 order_total=grand_total,
-                status="Pending",
+                status="Order_Placed",
                 order_number=order_number,
                 GST=GST,
                 sub_total=subTotal,
@@ -295,8 +238,8 @@ def order_success(request):
     status = order.status
     print('order status:',status)
     quantity = OrderProduct.quantity
-    payment = order.payment 
-    print('payment',payment)
+    payment = order.order.payment 
+    print('payment 1:',payment)
     order_number = order.order.order_number
     cart_items = CartItem.objects.all().filter(user=request.user)
     total=0
@@ -304,14 +247,13 @@ def order_success(request):
         total += cart_item.sub_total()
     
     GST= order.order.GST
-    # coupon_discount = Coupon.discount_amount.get(user=request.user)
-    # print('coupon_discount 1:',coupon_discount)
-    coupon_discount = str(request.GET.get('coupon_discount', 0))
+    coupon_discount = order.order.discount_amount
     
     print('coupon_discount :',coupon_discount)
     
     subtotal = order.order.sub_total
     grand_total = order.order.order_total
+    print("grand_total : ",grand_total)
 
     #clear cart
     CartItem.objects.filter(user=request.user).delete()
@@ -350,10 +292,12 @@ def order_deatils(request,id) :
     
     order = get_object_or_404(Order, id=id)
     order_items = OrderProduct.objects.filter(order__id=id)
+    GST = order.GST
     print('order item:',order_items)
     context = {
         'order_items':order_items,
         'order':order,
+        'GST' : GST,
     }
 
     return render(request,'admin-temp/order_details.html',context)
@@ -396,30 +340,35 @@ def cancel_product(request):
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method.'})
          
-# def cancel_order(request,id):
-#     order = Order.objects.get(pk = id)
-#     order.status="cancelled"
-#     order.save()
-#     return redirect('user_order_details')
 
 @login_required(login_url='user_login')
 def order_act(request):
     
     orderproduct_id = request.POST.get('orderproduct_id')
+    print("orderproduct_id :",orderproduct_id)
     orderproduct = OrderProduct.objects.get(order__user=request.user,id=orderproduct_id)
     product = orderproduct.product
+    print("product :",product)
     order = orderproduct.order
     order.order_total -= orderproduct.total()
     orderproduct.status = 'Cancelled'
     payment_method = orderproduct.order.payment.payment_method
     if payment_method != 'Cash On Delivery':
-        wallet = Wallet.objects.get(user_id=orderproduct.order.user.id)
-        wallet.balance += orderproduct.total()
+        wallet = Wallet.objects.filter(user_id=orderproduct.order.user.id)
+        Wallet.balance += orderproduct.order.order_total
         wallet.save()
     # orderproduct.product_price = 0
-    product.quantity += orderproduct.quantity
+    product.stock += orderproduct.quantity
     
     product.save()
     orderproduct.save()
     order.save()
-    return JsonResponse({'message':'hi'})    
+    return JsonResponse({'message':'hi'}) 
+
+@login_required(login_url='user_login')
+def order_return(request):
+    orderproduct_id = request.POST.get('orderproduct_id')
+    orderproduct = OrderProduct.objects.get(order__user=request.user, id=orderproduct_id)
+    orderproduct.status = 'Return Requested'
+    orderproduct.save()
+    return JsonResponse({'message':'The return for the product has been requested...'})   

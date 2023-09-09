@@ -46,7 +46,7 @@
                                     <ul class="list-unstyled mb0">
                                         <li><strong>Order Number</strong> #{{ order_number}}</li>
                                         <li><strong>Payment Method</strong> #{{ payment}}</li>
-                                        <li><strong>Payment Status:</strong> {{payment.status}}</li>
+                                        {% comment %} <li><strong>Payment Status:</strong> {{payment.status}}</li> {% endcomment %}
                                         {% comment %} <li><strong>Transaction ID</strong> {{transID}}</li> {% endcomment %}
                                         <li><strong>Order Date:</strong> {{order.created_at}}</li>                                    
                                     </ul>

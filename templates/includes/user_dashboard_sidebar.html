@@ -2,7 +2,7 @@
  
 {% block content %}
 <div class="col-md-4">
-    <div class="dashboard-men">
+    <div class="dashboard-m">
         <div class="list-grou">
             <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action {% if '/dashboard/' == request.path %}active{% endif %}"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
             <a href="{% url 'my_orders' %}" class="list-group-item list-group-item-action {% if '/my_orders/' == request.path %}active{% endif %}"><i class="fi-rs-shopping-bag mr-10"></i>My Orders</a>
@@ -11,6 +11,6 @@
             {% comment %} <a href="" class="list-group-item list-group-item-action {% if '/change-password/' == request.path %}active{% endif %}"><i class="fi fi-rs-lock mr-10"></i>Change Password</a> {% endcomment %}
             <a href="{% url 'logout' %}" class="list-group-item list-group-item-action"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
         </div>
-    </div>
+    </div>
 </div>
 {% endblock %}

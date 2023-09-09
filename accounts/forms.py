@@ -3,7 +3,7 @@ from django import forms
 from django.core.files.base import File
 from django.db.models.base import Model
 from django.forms.utils import ErrorList 
-from .models import Account,UserProfile
+from .models import Account,UserProfile,UserProfileImage
 
 class RegistrationForm(forms.ModelForm) :
     password = forms.CharField(widget=forms.PasswordInput(attrs={
@@ -38,23 +38,13 @@ class RegistrationForm(forms.ModelForm) :
                  )  
 
 
-class UserForm(forms.ModelForm) :
-    class Meta :
-          model = Account
-          fields = ('first_name','last_name','email','password','phone_number')
-    def __init__(self , *args ,**kwargs) :
-         super(UserForm , self).__init__(*args ,**kwargs)
-         for field in self.fields :
-            self.fields[field].widget.attrs['class'] = 'form-group' 
+class UserProfileForm(forms.ModelForm):
+    profile_pic = forms.ImageField(required=False,error_messages={'invalid':("Image files only")},widget=forms.FileInput)
+    class Meta:
+        model  = UserProfileImage
+        fields = ('first_name','last_name','profile_pic')
 
-
-class UserProfileForm(forms.ModelForm) :
-     profile_picture = forms.ImageField(required = False ,error_messages={'invalid':("Image Files Only")} ,widget=forms.FileInput)
-     class Meta :
-          model = UserProfile
-          fields = ('address_line_1','address_line_2','city','state','country','profile_picture','phone','post_code','default_addr') 
-
-     def __init__(self , *args ,**kwargs) :
-         super(UserProfileForm , self).__init__(*args ,**kwargs)
-         for field in self.fields :
-            self.fields[field].widget.attrs['class'] = 'form-group'                                   
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ('username','phone_number', 'email')                                 

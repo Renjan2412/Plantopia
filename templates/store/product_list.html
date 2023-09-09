@@ -6,44 +6,22 @@
 <section class="content-main">
     <div class="content-header">
         <div>
-            <h2 class="content-title card-title">Products grid</h2>
-            <p>Lorem ipsum dolor sit amet.</p>
+            <h2 class="content-title card-title">Products List</h2>
+            <p>Your Product List is Here...!</p>
         </div>
         <div>
             <a href="{% url 'add_product' %}" class="btn btn-primary btn-sm rounded">Create new</a>
         </div>
     </div>
     <div class="card mb-4">
-        {% comment %} <header class="card-header">
-            <div class="row gx-3">
-                <div class="col-lg-4 col-md-6 me-auto">
-                    <form action="{% url 'search' %}" method="GET">  
-                        <input type="text" placeholder="Search..." class="form-control" name="keyword">
-                    </form>
-                </div>
-                <div class="col-lg-2 col-6 col-md-3">
-                    <select class="form-select">
-                        <option>All category</option>
-                        <option>Electronics</option>
-                        <option>Clothings</option>
-                        <option>Something else</option>
-                    </select>
-                </div>
-                <div class="col-lg-2 col-6 col-md-3">
-                    <select class="form-select">
-                        <option>Latest added</option>
-                        <option>Cheap first</option>
-                        <option>Most viewed</option>
-                    </select>
-                </div>
-            </div>
-        </header> <!-- card-header end// --> {% endcomment %}
         <div class="card-body">
-            <div class="table-responsive">
+            <div class="table-responsive" id='pro-tab-body'>
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
                 <table class="table table-hover" id="productPagination">
                     <thead>
                         <tr>
-                            <th style="width: 100px;" class="text-center">Image</th>
+                            <th style="width: 50px ;" class="text-center">Image</th>
                             <th style="width: 200px;" class="text-center">Name</th>                          
                             <th style="width: 100px;" class="text-center">Price</th>
                             <th  style="width: 200px;" class="text-center">Action</th>
@@ -67,9 +45,14 @@
                                 <a href="{% url 'update_product' Product.id %}" class="btn btn-sm font-sm rounded btn-brand">
                                     <i class="material-icons md-edit"></i> Edit
                                 </a>
-                                <a href="{% url 'delete_product' Product.id %}" class="btn btn-sm font-sm btn-light rounded">
+                                <a  id='del-product' data-product-id="{{Product.id}}" class="btn btn-sm font-sm btn-light rounded">
                                     <i class="material-icons md-delete_forever"></i> Delete
                                 </a>
+                                {% if Product.is_available %}
+                                    <a class="btn btn-sm font-sm btn-outline-warning rounded" id='deact-product' data-product-id="{{Product.id}}">Deactivate</a>
+                                {% else %}
+                                    <a class="btn btn-sm font-sm btn-outline-primary rounded" id='deact-product' data-product-id="{{Product.id}}">Activate</a>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -80,16 +63,6 @@
          <!-- card-body end// -->
     </div> <!-- card end// -->
 </section> <!-- content-main end// -->
-
-</main>
-<script src="{% static 'assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
-<script src="{% static 'assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'assets/js/vendors/select2.min.js' %}"></script>
-<script src="{% static 'assets/js/vendors/perfect-scrollbar.js' %}"></script>
-<script src="{% static 'assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
-<!-- Main Script -->
-<script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
-</body>
 {% endblock %}
 {% block script %}
 <script>
@@ -102,5 +75,90 @@
         bInfo:true,
         bSort:false,
     })
+</script>
+<script>
+    $(document).on('click', '#del-product', function(){
+        var product_id = $(this).data('product-id')
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val()
+    
+        swal({
+            title: "Are You sure",
+            text:"Do you want to delete this Product???",
+            icon:"warning",
+            buttons: ["cancel", "Delete"],
+            dangerMode: true,
+        }).then(function(confirmDelete){
+            if (confirmDelete) {
+                $.ajax({
+                    url:"/admin_cu/del_product/" + product_id + "/",
+                    method:"POST",
+                    data:{
+                        'product_id':product_id,
+                        'csrfmiddlewaretoken':csrfToken,
+                    },
+                    success:function(response){
+                        swal({
+                            title:"Deleted",
+                            text:response.message,
+                            icon:"success",
+                            timer:4000,
+                            button:false,
+                        }).then(function() {
+                            $("#pro-tab-body").load(location.href + ' #pro-tab-body');
+                            
+                        });
+                    } 
+                })
+            }
+        });
+    
+        
+        
+    });
+</script>
+
+ 
+<script>
+    
+
+    $(document).on('click', '#deact-product', function(){
+        var product_id = $(this).data('product-id');
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+        var text = $(this).text();
+    
+        swal({
+            title: "Are You sure",
+            text: 'Do you want to '+ text +' this Product???',
+            icon: "warning",
+            buttons: ["cancel", "Confirm"],
+            dangerMode: true,
+        }).then(function(confirmConfirm){
+            if (confirmConfirm) {
+                $.ajax({
+                    url: "/admin_cu/deact_product/",
+                    method: "POST",
+                    data: {
+                        'product_id': product_id,
+                        'csrfmiddlewaretoken': csrfToken,
+                    },
+                    success: function(response) {
+                        swal({
+                            title: response.title,
+                            text: response.message,
+                            icon: "success",
+                            timer: 4000,
+                            button: false,
+                            
+                        }).then(function() {
+                            // Reload the specified area
+                            $("#pro-tab-body").load(location.href + ' #pro-tab-body');
+                            
+                        });
+                    }
+                });
+            }
+        });
+    });
+    
 </script>
 {% endblock script %}
